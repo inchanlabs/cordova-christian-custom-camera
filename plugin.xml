@@ -16,11 +16,6 @@
     </engines>
 
     <!-- JavaScript API -->
-    <js-module
-        src="www/CameraConstants.js"
-        name="CameraConstants">
-        <clobbers target="Camera" />
-    </js-module>
 
     <js-module
         src="www/Camera.js"
