@@ -1,15 +1,13 @@
-
-
 package com.christian.customcamera
 
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Base64
 import androidx.core.content.FileProvider
 import org.apache.cordova.CallbackContext
 import org.apache.cordova.CordovaPlugin
@@ -59,19 +57,21 @@ class CameraLauncher : CordovaPlugin() {
             val options = args.optJSONObject(0)
 
             quality = options?.optInt(QUALITY, 80) ?: 80
+
             destinationType =
-                options?.optInt(DESTINATION_TYPE, DATA_URL) ?: DATA_URL
+                options?.optInt(
+                    DESTINATION_TYPE,
+                    DATA_URL
+                ) ?: DATA_URL
 
             cameraDirection =
-                options?.optInt(CAMERA_DIRECTION, BACK) ?: BACK
+                options?.optInt(
+                    CAMERA_DIRECTION,
+                    BACK
+                ) ?: BACK
 
-            if (quality < 0) {
-                quality = 0
-            }
-
-            if (quality > 100) {
-                quality = 100
-            }
+            // Keep quality within valid JPEG range
+            quality = quality.coerceIn(0, 100)
 
             openCamera()
 
@@ -97,6 +97,9 @@ class CameraLauncher : CordovaPlugin() {
 
     private fun openCamera() {
 
+        /*
+         * Check whether the device has a camera.
+         */
         if (!cordova.activity.packageManager.hasSystemFeature(
                 PackageManager.FEATURE_CAMERA_ANY
             )
@@ -109,15 +112,19 @@ class CameraLauncher : CordovaPlugin() {
             return
         }
 
+        /*
+         * Create camera intent.
+         */
         val intent = Intent(
             MediaStore.ACTION_IMAGE_CAPTURE
         )
 
         /*
-         * Request the front/back camera.
+         * Request front/back camera.
          *
-         * Android camera applications commonly recognize
-         * this Camera2-compatible intent extra.
+         * These extras are commonly supported by Android camera
+         * applications. The actual behavior can depend on the
+         * device's camera application.
          */
         if (cameraDirection == FRONT) {
 
@@ -145,7 +152,7 @@ class CameraLauncher : CordovaPlugin() {
         }
 
         /*
-         * Create temporary image file.
+         * Create a temporary JPEG file in the application's cache.
          */
         val imageFile = File.createTempFile(
             "custom_camera_",
@@ -153,25 +160,42 @@ class CameraLauncher : CordovaPlugin() {
             cordova.activity.cacheDir
         )
 
+        /*
+         * Convert the file into a FileProvider URI.
+         */
         imageUri = FileProvider.getUriForFile(
             cordova.activity,
             "${cordova.activity.packageName}.customcamera.fileprovider",
             imageFile
         )
 
+        /*
+         * Tell the camera application where to save
+         * the captured image.
+         */
         intent.putExtra(
             MediaStore.EXTRA_OUTPUT,
             imageUri
         )
 
+        /*
+         * Give the camera application temporary access
+         * to the FileProvider URI.
+         */
         intent.addFlags(
             Intent.FLAG_GRANT_WRITE_URI_PERMISSION or
                     Intent.FLAG_GRANT_READ_URI_PERMISSION
         )
 
-        cordova.setActivityResultCallback(this)
-
-        cordova.activity.startActivityForResult(
+        /*
+         * Use Cordova's activity-result mechanism.
+         *
+         * This replaces the deprecated:
+         *
+         * activity.startActivityForResult(...)
+         */
+        cordova.startActivityForResult(
+            this,
             intent,
             REQUEST_CAMERA
         )
@@ -183,10 +207,16 @@ class CameraLauncher : CordovaPlugin() {
         intent: Intent?
     ) {
 
+        /*
+         * Ignore results that do not belong to our camera request.
+         */
         if (requestCode != REQUEST_CAMERA) {
             return
         }
 
+        /*
+         * User cancelled the camera.
+         */
         if (resultCode != Activity.RESULT_OK) {
 
             callbackContext?.error(
@@ -202,6 +232,9 @@ class CameraLauncher : CordovaPlugin() {
 
             val uri = imageUri
 
+            /*
+             * Make sure we have the captured image URI.
+             */
             if (uri == null) {
 
                 callbackContext?.error(
@@ -213,6 +246,9 @@ class CameraLauncher : CordovaPlugin() {
                 return
             }
 
+            /*
+             * Return the captured image as a File URI.
+             */
             if (destinationType == FILE_URI) {
 
                 callbackContext?.success(
@@ -221,6 +257,9 @@ class CameraLauncher : CordovaPlugin() {
 
             } else {
 
+                /*
+                 * Return the captured image as Base64.
+                 */
                 val base64 = convertToBase64(uri)
 
                 if (base64.isNullOrEmpty()) {
@@ -249,6 +288,15 @@ class CameraLauncher : CordovaPlugin() {
         }
     }
 
+    /*
+     * Convert the captured image into Base64.
+     *
+     * The returned value is ONLY the Base64 string.
+     *
+     * It does NOT contain:
+     *
+     * data:image/jpeg;base64,
+     */
     private fun convertToBase64(
         uri: Uri
     ): String? {
@@ -270,20 +318,26 @@ class CameraLauncher : CordovaPlugin() {
                 ByteArrayOutputStream()
 
             bitmap.compress(
-                Bitmap.CompressFormat.JPEG,
+                android.graphics.Bitmap.CompressFormat.JPEG,
                 quality,
                 outputStream
             )
 
             bitmap.recycle()
 
-            return android.util.Base64.encodeToString(
+            return Base64.encodeToString(
                 outputStream.toByteArray(),
-                android.util.Base64.NO_WRAP
+                Base64.NO_WRAP
             )
         }
     }
 
+    /*
+     * Clear the temporary URI reference.
+     *
+     * The actual temporary file is left in the application's
+     * cache directory and can be cleaned by Android.
+     */
     private fun cleanup() {
 
         try {
@@ -303,8 +357,75 @@ class CameraLauncher : CordovaPlugin() {
             }
 
         } catch (_: Exception) {
+            // Ignore cleanup errors
         }
 
         imageUri = null
+    }
+
+    /*
+     * Preserve important state if Android destroys and recreates
+     * the Cordova activity while the camera is open.
+     */
+    override fun onSaveInstanceState(): Bundle {
+
+        val state = Bundle()
+
+        state.putInt(
+            "quality",
+            quality
+        )
+
+        state.putInt(
+            "destinationType",
+            destinationType
+        )
+
+        state.putInt(
+            "cameraDirection",
+            cameraDirection
+        )
+
+        imageUri?.let {
+            state.putString(
+                "imageUri",
+                it.toString()
+            )
+        }
+
+        return state
+    }
+
+    override fun onRestoreStateForActivityResult(
+        state: Bundle,
+        callbackContext: CallbackContext
+    ) {
+
+        this.callbackContext = callbackContext
+
+        quality = state.getInt(
+            "quality",
+            80
+        )
+
+        destinationType = state.getInt(
+            "destinationType",
+            DATA_URL
+        )
+
+        cameraDirection = state.getInt(
+            "cameraDirection",
+            BACK
+        )
+
+        val savedUri =
+            state.getString("imageUri")
+
+        if (!savedUri.isNullOrEmpty()) {
+
+            imageUri = Uri.parse(
+                savedUri
+            )
+        }
     }
 }
