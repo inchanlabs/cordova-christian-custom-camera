@@ -18,10 +18,12 @@
 
     <!-- JavaScript -->
     <js-module
-        src="www/Camera.js"
-        name="Camera">
+    src="www/Camera.js"
+    name="Camera">
 
-        <clobbers target="navigator.camera" />
+    <clobbers target="navigator.christianCamera" />
+
+</js-module>
 
     </js-module>
 
