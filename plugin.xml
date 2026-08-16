@@ -24,7 +24,9 @@
     src="www/Camera.js"
     name="CustomCamera">
 
-    <clobbers target="CustomCamera" />
+    <clobbers target="navigator.christianCamera" />
+
+</js-module>
 
 </js-module>
 
