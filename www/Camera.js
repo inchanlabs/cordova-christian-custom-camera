@@ -2,6 +2,8 @@ var exec = require("cordova/exec");
 
 var Camera = {
 
+    TEST_VALUE: "CHRISTIAN_CUSTOM_CAMERA_V1",
+
     DestinationType: {
         DATA_URL: 0,
         FILE_URI: 1
