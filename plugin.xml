@@ -77,7 +77,7 @@
 
         <resource-file
             src="src/android/xml/custom_camera_paths.xml"
-            target="app/src/main/res/xml/custom_camera_paths.xml" />
+            target="res/xml/custom_camera_paths.xml" />
 
         <framework
             src="androidx.core:core-ktx:1.13.1" />
