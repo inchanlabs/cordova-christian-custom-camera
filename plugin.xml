@@ -4,7 +4,7 @@
     xmlns="http://apache.org/cordova/ns/plugins/1.0"
     xmlns:android="http://schemas.android.com/apk/res/android"
     id="cordova-christian-custom-camera"
-    version="1.0.0">
+    version="1.0.1">
 
     <name>Christian Custom Camera</name>
     <description>Custom Cordova Camera Plugin</description>
