@@ -1,5 +1,3 @@
-var exec = require("cordova/exec");
-
 var Camera = {
 
     TEST_VALUE: "CHRISTIAN_CUSTOM_CAMERA_V1",
@@ -9,38 +7,19 @@ var Camera = {
         FRONT: 1
     },
 
-    getPicture: function (successCallback, errorCallback, options) {
+    getPicture: function (
+        successCallback,
+        errorCallback,
+        options
+    ) {
 
-        options = options || {};
+        console.log("CAMERA JS: getPicture ENTERED");
 
-        console.log("CUSTOM CAMERA: getPicture called");
-        console.log("CUSTOM CAMERA: calling Cordova exec");
-        console.log("CUSTOM CAMERA: service = CustomCamera");
-        console.log("CUSTOM CAMERA: action = takePicture");
+        if (successCallback) {
+            successCallback("CAMERA JS FUNCTION REACHED");
+        }
 
-        exec(
-            function (result) {
-                console.log(
-                    "CUSTOM CAMERA: SUCCESS = " + result
-                );
-
-                if (successCallback) {
-                    successCallback(result);
-                }
-            },
-            function (error) {
-                console.log(
-                    "CUSTOM CAMERA: ERROR = " + error
-                );
-
-                if (errorCallback) {
-                    errorCallback(error);
-                }
-            },
-            "CustomCamera",
-            "takePicture",
-            [options]
-        );
+        console.log("CAMERA JS: getPicture EXITED");
     }
 };
 
