@@ -1,1 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
 
+<plugin
+    xmlns="http://apache.org/cordova/ns/plugins/1.0"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    id="cordova-christian-custom-camera"
+    version="1.0.0">
+
+    <name>Christian Custom Camera</name>
+    <description>Custom Cordova Camera Plugin for OutSystems ODC</description>
+    <license>Apache 2.0</license>
+    <keywords>cordova,camera,outsystems,odc</keywords>
+
+    <!-- JavaScript API -->
+    <js-module
+        src="www/Camera.js"
+        name="Camera">
+
+        <clobbers target="navigator.camera" />
+
+    </js-module>
+
+    <js-module
+        src="www/CameraConstants.js"
+        name="CameraConstants">
+
+        <clobbers target="Camera" />
+
+    </js-module>
+
+    <!-- Android -->
+    <platform name="android">
+
+        <!-- Camera permission only -->
+        <config-file
+            target="app/src/main/AndroidManifest.xml"
+            parent="/*">
+
+            <uses-permission
+                android:name="android.permission.CAMERA" />
+
+        </config-file>
+
+        <!-- Camera Cordova plugin -->
+        <config-file
+            target="res/xml/config.xml"
+            parent="/*">
+
+            <feature name="Camera">
+                <param
+                    name="android-package"
+                    value="com.christian.customcamera.CameraLauncher" />
+            </feature>
+
+        </config-file>
+
+        <!-- Kotlin Camera implementation -->
+        <source-file
+            src="src/android/CameraLauncher.kt"
+            target-dir="app/src/main/kotlin/com/christian/customcamera" />
+
+    </platform>
+
+</plugin>
