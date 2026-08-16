@@ -83,7 +83,7 @@
         <!-- FileProvider paths -->
         <resource-file
             src="src/android/xml/custom_camera_paths.xml"
-            target="app/src/main/res/xml/custom_camera_paths.xml" />
+            target="res/xml/custom_camera_paths.xml" />
 
         <!-- AndroidX Core -->
         <framework
