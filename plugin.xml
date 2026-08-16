@@ -16,6 +16,7 @@
         <engine name="cordova-android" version=">=10.0.0" />
     </engines>
 
+    <!-- JavaScript API -->
     <js-module
         src="www/Camera.js"
         name="Camera">
@@ -24,8 +25,10 @@
 
     </js-module>
 
+    <!-- Android -->
     <platform name="android">
 
+        <!-- Camera permission -->
         <config-file
             target="AndroidManifest.xml"
             parent="/manifest">
@@ -35,6 +38,7 @@
 
         </config-file>
 
+        <!-- FileProvider -->
         <config-file
             target="AndroidManifest.xml"
             parent="/manifest/application">
@@ -53,6 +57,7 @@
 
         </config-file>
 
+        <!-- Cordova plugin registration -->
         <config-file
             target="res/xml/config.xml"
             parent="/*">
@@ -67,18 +72,22 @@
 
         </config-file>
 
+        <!-- Kotlin CameraLauncher -->
         <source-file
             src="src/android/CameraLauncher.kt"
             target-dir="app/src/main/kotlin/com/christian/customcamera" />
 
+        <!-- FileProvider -->
         <source-file
             src="src/android/FileProvider.java"
             target-dir="app/src/main/java/com/christian/customcamera" />
 
+        <!-- FileProvider paths -->
         <resource-file
             src="src/android/xml/custom_camera_paths.xml"
-            target="res/xml/custom_camera_paths.xml" />
+            target="app/src/main/res/xml/custom_camera_paths.xml" />
 
+        <!-- AndroidX Core -->
         <framework
             src="androidx.core:core-ktx:1.13.1" />
 
