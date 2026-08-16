@@ -7,46 +7,62 @@
     version="1.0.0">
 
     <name>Christian Custom Camera</name>
-    <description>Custom Cordova Camera Plugin for OutSystems ODC</description>
+    <description>Custom Cordova Camera Plugin</description>
     <license>Apache 2.0</license>
-    <keywords>cordova,camera,outsystems,odc</keywords>
+
+    <engines>
+        <engine name="cordova" version=">=10.0.0" />
+        <engine name="cordova-android" version=">=10.0.0" />
+    </engines>
 
     <!-- JavaScript API -->
     <js-module
-        src="www/Camera.js"
-        name="Camera">
-
-        <clobbers target="navigator.camera" />
-
+        src="www/CameraConstants.js"
+        name="CameraConstants">
+        <clobbers target="Camera" />
     </js-module>
 
     <js-module
-        src="www/CameraConstants.js"
-        name="CameraConstants">
-
-        <clobbers target="Camera" />
-
+        src="www/Camera.js"
+        name="Camera">
+        <clobbers target="navigator.camera" />
     </js-module>
 
     <!-- Android -->
     <platform name="android">
 
-        <!-- Camera permission only -->
         <config-file
-            target="app/src/main/AndroidManifest.xml"
-            parent="/*">
+            target="AndroidManifest.xml"
+            parent="/manifest">
 
             <uses-permission
                 android:name="android.permission.CAMERA" />
 
         </config-file>
 
-        <!-- Camera Cordova plugin -->
+        <config-file
+            target="AndroidManifest.xml"
+            parent="/manifest/application">
+
+            <provider
+                android:name="androidx.core.content.FileProvider"
+                android:authorities="${applicationId}.customcamera.fileprovider"
+                android:exported="false"
+                android:grantUriPermissions="true">
+
+                <meta-data
+                    android:name="android.support.FILE_PROVIDER_PATHS"
+                    android:resource="@xml/custom_camera_paths" />
+
+            </provider>
+
+        </config-file>
+
         <config-file
             target="res/xml/config.xml"
             parent="/*">
 
-            <feature name="Camera">
+            <feature name="CustomCamera">
                 <param
                     name="android-package"
                     value="com.christian.customcamera.CameraLauncher" />
@@ -54,10 +70,20 @@
 
         </config-file>
 
-        <!-- Kotlin Camera implementation -->
         <source-file
             src="src/android/CameraLauncher.kt"
             target-dir="app/src/main/kotlin/com/christian/customcamera" />
+
+        <source-file
+            src="src/android/FileProvider.java"
+            target-dir="app/src/main/java/com/christian/customcamera" />
+
+        <resource-file
+            src="src/android/xml/custom_camera_paths.xml"
+            target="app/src/main/res/xml/custom_camera_paths.xml" />
+
+        <framework
+            src="androidx.core:core-ktx:1.13.1" />
 
     </platform>
 
