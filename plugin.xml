@@ -8,29 +8,32 @@
 
     <name>Christian Custom Camera</name>
     <description>Custom Cordova Camera Plugin</description>
-    <license>Apache 2.0</license>
-    <keywords>cordova,camera</keywords>
+    <license>Apache-2.0</license>
+    <keywords>cordova,camera,custom</keywords>
 
     <engines>
         <engine name="cordova" version=">=10.0.0" />
         <engine name="cordova-android" version=">=10.0.0" />
     </engines>
 
-    <!-- JavaScript -->
-    <js-module
-    src="www/Camera.js"
-    name="Camera">
-
-    <clobbers target="navigator.christianCamera" />
-
-</js-module>
-
+    <js-module src="www/Camera.js" name="Camera">
+        <clobbers target="navigator.christianCamera" />
     </js-module>
 
-    <!-- Android -->
     <platform name="android">
 
-        <!-- Camera permission -->
+        <preference
+            name="GradlePluginKotlinEnabled"
+            default="true" />
+
+        <preference
+            name="GradlePluginKotlinCodeStyle"
+            default="official" />
+
+        <preference
+            name="AndroidXEnabled"
+            default="true" />
+
         <config-file
             target="AndroidManifest.xml"
             parent="/manifest">
@@ -40,7 +43,6 @@
 
         </config-file>
 
-        <!-- FileProvider -->
         <config-file
             target="AndroidManifest.xml"
             parent="/manifest/application">
@@ -59,7 +61,6 @@
 
         </config-file>
 
-        <!-- Cordova registration -->
         <config-file
             target="res/xml/config.xml"
             parent="/*">
@@ -72,24 +73,19 @@
 
         </config-file>
 
-        <!-- CameraLauncher -->
         <source-file
             src="src/android/CameraLauncher.kt"
             target-dir="app/src/main/kotlin/com/christian/customcamera" />
 
-        <!-- FileProvider -->
         <source-file
             src="src/android/FileProvider.java"
             target-dir="app/src/main/java/com/christian/customcamera" />
 
-        <!-- FileProvider paths -->
         <resource-file
             src="src/android/xml/custom_camera_paths.xml"
-            target="res/xml/custom_camera_paths.xml" />
+            target="app/src/main/res/xml/custom_camera_paths.xml" />
 
-        <!-- AndroidX Core -->
-        <framework
-            src="androidx.core:core-ktx:1.13.1" />
+        <framework src="androidx.core:core-ktx:1.13.1" />
 
     </platform>
 
