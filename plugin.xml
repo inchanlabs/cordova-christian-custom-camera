@@ -21,12 +21,12 @@
     <!-- ================================================== -->
 
     <js-module
-        src="www/Camera.js"
-        name="Camera">
+    src="www/Camera.js"
+    name="CustomCamera">
 
-        <clobbers target="navigator.camera" />
+    <clobbers target="CustomCamera" />
 
-    </js-module>
+</js-module>
 
 
     <!-- ================================================== -->
