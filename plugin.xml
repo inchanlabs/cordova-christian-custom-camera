@@ -28,18 +28,6 @@
     <!-- Android -->
     <platform name="android">
 
-        <preference
-            name="GradlePluginKotlinEnabled"
-            value="true" />
-
-        <preference
-            name="GradlePluginKotlinCodeStyle"
-            value="official" />
-
-        <preference
-            name="AndroidXEnabled"
-            value="true" />
-
         <!-- Camera permission -->
         <config-file
             target="AndroidManifest.xml"
