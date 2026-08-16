@@ -1,4 +1,11 @@
-package com.christian.customcamera;
+<provider
+    android:name="com.christian.customcamera.FileProvider"
+    android:authorities="${applicationId}.customcamera.fileprovider"
+    android:exported="false"
+    android:grantUriPermissions="true">
 
-public class FileProvider extends androidx.core.content.FileProvider {
-}
+    <meta-data
+        android:name="android.support.FILE_PROVIDER_PATHS"
+        android:resource="@xml/custom_camera_paths" />
+
+</provider>
