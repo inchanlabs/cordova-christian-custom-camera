@@ -4,7 +4,8 @@ var Camera = {
 
     DestinationType: {
         DATA_URL: 0,
-        FILE_URI: 1
+        FILE_URI: 1,
+        NATIVE_URI: 2
     },
 
     EncodingType: {
