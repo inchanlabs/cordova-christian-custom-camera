@@ -13,9 +13,30 @@ var Camera = {
 
         options = options || {};
 
+        console.log("CUSTOM CAMERA: getPicture called");
+        console.log("CUSTOM CAMERA: calling Cordova exec");
+        console.log("CUSTOM CAMERA: service = CustomCamera");
+        console.log("CUSTOM CAMERA: action = takePicture");
+
         exec(
-            successCallback,
-            errorCallback,
+            function (result) {
+                console.log(
+                    "CUSTOM CAMERA: SUCCESS = " + result
+                );
+
+                if (successCallback) {
+                    successCallback(result);
+                }
+            },
+            function (error) {
+                console.log(
+                    "CUSTOM CAMERA: ERROR = " + error
+                );
+
+                if (errorCallback) {
+                    errorCallback(error);
+                }
+            },
             "CustomCamera",
             "takePicture",
             [options]
