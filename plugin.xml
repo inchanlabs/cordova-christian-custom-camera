@@ -54,7 +54,7 @@
 
                 <meta-data
                     android:name="android.support.FILE_PROVIDER_PATHS"
-                    android:resource="@xml/custom_camera_file_paths" />
+                    android:resource="@xml/camera_provider_paths" />
 
             </provider>
 
@@ -62,8 +62,8 @@
 
         <!-- FileProvider Paths -->
         <resource-file
-            src="src/android/res/xml/custom_camera_file_paths.xml"
-            target="app/src/main/res/xml/custom_camera_file_paths.xml" />
+            src="src/android/xml/camera_provider_paths.xml"
+            target="app/src/main/res/xml/camera_provider_paths.xml" />
 
         <!-- Kotlin Source -->
         <source-file
