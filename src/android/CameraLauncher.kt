@@ -175,8 +175,7 @@ class CameraLauncher : CordovaPlugin() {
                 return
             }
 
-            // Get actual image dimensions without loading
-            // the entire image into memory.
+            // Get the actual captured image dimensions.
             val options = BitmapFactory.Options()
             options.inJustDecodeBounds = true
 
@@ -191,7 +190,7 @@ class CameraLauncher : CordovaPlugin() {
             val fileSizeKB =
                 file.length() / 1024
 
-            // Read the captured full-resolution JPEG.
+            // Read the full-resolution JPEG.
             val fileBytes =
                 FileInputStream(file).use {
                     it.readBytes()
@@ -213,8 +212,7 @@ class CameraLauncher : CordovaPlugin() {
                     Base64.NO_WRAP
                 )
 
-            // Return both the Base64 image and
-            // diagnostic information.
+            // Build the diagnostic JSON result.
             val result = JSONObject()
 
             result.put(
@@ -237,7 +235,11 @@ class CameraLauncher : CordovaPlugin() {
                 fileSizeKB
             )
 
+            // IMPORTANT:
+            // Unique marker to prove this native version
+            // is actually deployed in the ODC APK.
             callbackContext?.success(
+                "NATIVE_STEP_2K:" +
                 result.toString()
             )
 
