@@ -29,14 +29,15 @@
             </feature>
         </config-file>
 
-        <!-- Correct Target Directory Path for ODC / Cordova Android 10+ -->
+        <!-- Manifest Permissions (Includes Android Namespace) -->
+        <config-file target="AndroidManifest.xml" parent="/*" xmlns:android="http://schemas.android.com/apk/res/android">
+            <uses-permission android:name="android.permission.CAMERA" />
+        </config-file>
+
+        <!-- Source File Path for Cordova Android 10+ -->
         <source-file
             src="src/android/CameraLauncher.kt"
             target-dir="app/src/main/java/com/christian/customcamera" />
-
-        <config-file target="AndroidManifest.xml" parent="/*">
-        <uses-permission android:name="android.permission.CAMERA" />
-        </config-file>
 
     </platform>
 
