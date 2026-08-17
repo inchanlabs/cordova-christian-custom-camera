@@ -15,15 +15,50 @@ var Camera = {
         options
     ) {
 
-        console.log("CAMERA JS: ENTERED");
+        console.log("CAMERA JS: BEFORE EXEC");
 
-        if (successCallback) {
-            successCallback(
-                "CAMERA JS REACHED WITH EXEC LOADED"
+        try {
+
+            exec(
+                function (result) {
+
+                    console.log(
+                        "CAMERA JS: EXEC SUCCESS: " + result
+                    );
+
+                    if (successCallback) {
+                        successCallback(result);
+                    }
+                },
+                function (error) {
+
+                    console.log(
+                        "CAMERA JS: EXEC ERROR: " + error
+                    );
+
+                    if (errorCallback) {
+                        errorCallback(error);
+                    }
+                },
+                "CustomCamera",
+                "takePicture",
+                []
             );
-        }
 
-        console.log("CAMERA JS: EXITED");
+            console.log("CAMERA JS: AFTER EXEC");
+
+        } catch (e) {
+
+            console.log(
+                "CAMERA JS: EXEC EXCEPTION: " + e.message
+            );
+
+            if (errorCallback) {
+                errorCallback(
+                    "EXEC EXCEPTION: " + e.message
+                );
+            }
+        }
     }
 };
 
