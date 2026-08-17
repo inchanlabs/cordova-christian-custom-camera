@@ -8,14 +8,11 @@ import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.provider.MediaStore
-import android.util.Base64
 import androidx.core.content.FileProvider
 import org.apache.cordova.CallbackContext
 import org.apache.cordova.CordovaPlugin
 import org.json.JSONArray
-import org.json.JSONObject
 import java.io.File
-import java.io.FileInputStream
 
 class CameraLauncher : CordovaPlugin() {
 
@@ -175,8 +172,10 @@ class CameraLauncher : CordovaPlugin() {
                 return
             }
 
-            // Get the actual captured image dimensions.
+            // Read only the JPEG header to determine
+            // the actual image resolution.
             val options = BitmapFactory.Options()
+
             options.inJustDecodeBounds = true
 
             BitmapFactory.decodeFile(
@@ -190,57 +189,21 @@ class CameraLauncher : CordovaPlugin() {
             val fileSizeKB =
                 file.length() / 1024
 
-            // Read the full-resolution JPEG.
-            val fileBytes =
-                FileInputStream(file).use {
-                    it.readBytes()
-                }
-
-            if (fileBytes.isEmpty()) {
-
-                callbackContext?.error(
-                    "Captured image is empty."
-                )
-
-                cleanupImageFile()
-                return
-            }
-
-            val base64Image =
-                Base64.encodeToString(
-                    fileBytes,
-                    Base64.NO_WRAP
-                )
-
-            // Build the diagnostic JSON result.
-            val result = JSONObject()
-
-            result.put(
-                "base64",
-                "data:image/jpeg;base64,$base64Image"
-            )
-
-            result.put(
-                "width",
-                width
-            )
-
-            result.put(
-                "height",
-                height
-            )
-
-            result.put(
-                "sizeKB",
-                fileSizeKB
-            )
-
             // IMPORTANT:
-            // Unique marker to prove this native version
-            // is actually deployed in the ODC APK.
+            // Do NOT read the image into memory yet.
+            // Do NOT Base64 encode it yet.
+            //
+            // We are only testing the captured
+            // image resolution and file size.
+
             callbackContext?.success(
-                "NATIVE_STEP_2K:" +
-                result.toString()
+                "RESOLUTION: " +
+                width +
+                "x" +
+                height +
+                " | SIZE: " +
+                fileSizeKB +
+                " KB"
             )
 
             cleanupImageFile()
@@ -248,7 +211,7 @@ class CameraLauncher : CordovaPlugin() {
         } catch (e: Exception) {
 
             callbackContext?.error(
-                "Failed to process captured image: " +
+                "Failed to inspect captured image: " +
                 e.message
             )
 
