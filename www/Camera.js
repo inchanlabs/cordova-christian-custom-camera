@@ -1,8 +1,6 @@
-var exec = require("cordova/exec");
-
 var Camera = {
 
-    TEST_VALUE: "CHRISTIAN_CUSTOM_CAMERA_V1",
+    TEST_VALUE: "STEP5_CAMERA_JS_2026",
 
     CameraDirection: {
         BACK: 0,
@@ -11,15 +9,12 @@ var Camera = {
 
     getPicture: function (successCallback, errorCallback, options) {
 
-        options = options || {};
+        console.log("STEP 5: CAMERA.JS LOADED");
+        console.log("STEP 5: GETPICTURE CALLED");
 
-        exec(
-            successCallback,
-            errorCallback,
-            "CustomCamera",
-            "takePicture",
-            [options]
-        );
+        if (successCallback) {
+            successCallback("STEP 5 CAMERA JS WORKS");
+        }
     }
 };
 
