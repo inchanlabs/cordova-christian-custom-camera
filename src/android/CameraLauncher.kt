@@ -12,7 +12,17 @@ class CameraLauncher : CordovaPlugin() {
         callbackContext: CallbackContext
     ): Boolean {
 
+        android.util.Log.d(
+            "ChristianCustomCamera",
+            "EXECUTE CALLED: action=$action"
+        )
+
         if (action == "takePicture") {
+
+            android.util.Log.d(
+                "ChristianCustomCamera",
+                "TAKE PICTURE ACTION REACHED"
+            )
 
             callbackContext.success(
                 "NATIVE CAMERA PLUGIN REACHED"
