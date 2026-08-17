@@ -56,7 +56,7 @@
         <!-- Native Kotlin implementation -->
         <source-file
             src="src/android/CameraLauncher.kt"
-            target-dir="app/src/main/kotlin/com/christian/customcamera" />
+            target-dir="src/main/kotlin/com/christian/customcamera" />
 
         <!-- AndroidX -->
         <framework
