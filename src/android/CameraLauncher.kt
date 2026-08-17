@@ -75,7 +75,7 @@ class CameraLauncher : CordovaPlugin() {
 
                 if (imageBitmap != null) {
                     val byteArrayOutputStream = ByteArrayOutputStream()
-                    imageBitmap.compress(Bitmap.CompressFormat.JPEG, 90, byteArrayOutputStream)
+                    imageBitmap.compress(Bitmap.CompressFormat.JPEG, 80, byteArrayOutputStream)
                     val byteArray = byteArrayOutputStream.toByteArray()
                     val base64Image = Base64.encodeToString(byteArray, Base64.NO_WRAP)
 
