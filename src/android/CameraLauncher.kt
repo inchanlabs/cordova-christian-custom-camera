@@ -13,7 +13,9 @@ import androidx.core.content.FileProvider
 import org.apache.cordova.CallbackContext
 import org.apache.cordova.CordovaPlugin
 import org.json.JSONArray
+import org.json.JSONObject
 import java.io.File
+import java.io.FileInputStream
 
 class CameraLauncher : CordovaPlugin() {
 
@@ -173,6 +175,8 @@ class CameraLauncher : CordovaPlugin() {
                 return
             }
 
+            // Get actual image dimensions without loading
+            // the entire image into memory.
             val options = BitmapFactory.Options()
             options.inJustDecodeBounds = true
 
@@ -183,10 +187,58 @@ class CameraLauncher : CordovaPlugin() {
 
             val width = options.outWidth
             val height = options.outHeight
-            val fileSizeKB = file.length() / 1024
+
+            val fileSizeKB =
+                file.length() / 1024
+
+            // Read the captured full-resolution JPEG.
+            val fileBytes =
+                FileInputStream(file).use {
+                    it.readBytes()
+                }
+
+            if (fileBytes.isEmpty()) {
+
+                callbackContext?.error(
+                    "Captured image is empty."
+                )
+
+                cleanupImageFile()
+                return
+            }
+
+            val base64Image =
+                Base64.encodeToString(
+                    fileBytes,
+                    Base64.NO_WRAP
+                )
+
+            // Return both the Base64 image and
+            // diagnostic information.
+            val result = JSONObject()
+
+            result.put(
+                "base64",
+                "data:image/jpeg;base64,$base64Image"
+            )
+
+            result.put(
+                "width",
+                width
+            )
+
+            result.put(
+                "height",
+                height
+            )
+
+            result.put(
+                "sizeKB",
+                fileSizeKB
+            )
 
             callbackContext?.success(
-                "RESOLUTION: ${width}x${height}, SIZE: ${fileSizeKB} KB"
+                result.toString()
             )
 
             cleanupImageFile()
@@ -194,7 +246,7 @@ class CameraLauncher : CordovaPlugin() {
         } catch (e: Exception) {
 
             callbackContext?.error(
-                "Failed to inspect image: " +
+                "Failed to process captured image: " +
                 e.message
             )
 
@@ -214,6 +266,7 @@ class CameraLauncher : CordovaPlugin() {
             }
 
         } catch (_: Exception) {
+            // Ignore cleanup errors.
         }
 
         imageFile = null
