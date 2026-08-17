@@ -1,6 +1,8 @@
+var exec = require("cordova/exec");
+
 var Camera = {
 
-    TEST_VALUE: "STEP_7F_CAMERA_JS",
+    TEST_VALUE: "STEP_8_EXEC_TEST",
 
     CameraDirection: {
         BACK: 0,
@@ -9,13 +11,52 @@ var Camera = {
 
     getPicture: function (successCallback, errorCallback, options) {
 
-        console.log("STEP 7F: CAMERA.JS GETPICTURE ENTERED");
+        console.log("STEP 8: BEFORE EXEC");
 
-        if (successCallback) {
-            successCallback("STEP 7F CAMERA JS WORKS");
+        try {
+
+            exec(
+                function (result) {
+
+                    console.log(
+                        "STEP 8: EXEC SUCCESS: " + result
+                    );
+
+                    if (successCallback) {
+                        successCallback(result);
+                    }
+                },
+
+                function (error) {
+
+                    console.log(
+                        "STEP 8: EXEC ERROR: " + error
+                    );
+
+                    if (errorCallback) {
+                        errorCallback(error);
+                    }
+                },
+
+                "FakeTestPlugin",
+                "test",
+                []
+            );
+
+            console.log("STEP 8: AFTER EXEC");
+
+        } catch (error) {
+
+            console.log(
+                "STEP 8: EXEC EXCEPTION: " + error
+            );
+
+            if (errorCallback) {
+                errorCallback(
+                    "EXEC EXCEPTION: " + error
+                );
+            }
         }
-
-        console.log("STEP 7F: CAMERA.JS GETPICTURE EXITED");
     }
 };
 
