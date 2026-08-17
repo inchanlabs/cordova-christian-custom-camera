@@ -22,11 +22,6 @@
     <!-- Android Platform Configuration -->
     <platform name="android">
 
-        <!-- Bind tools namespace to root manifest to prevent SAXParseException -->
-        <edit-config file="AndroidManifest.xml" target="/manifest" mode="merge">
-            <manifest xmlns:tools="http://schemas.android.com/tools" />
-        </edit-config>
-
         <!-- Config.xml Registration -->
         <config-file target="res/xml/config.xml" parent="/*">
             <feature name="CustomCamera">
@@ -34,35 +29,12 @@
             </feature>
         </config-file>
 
-        <!-- Manifest Permissions Block -->
-        <config-file target="AndroidManifest.xml" parent="/manifest" xmlns:android="http://schemas.android.com/apk/res/android">
+        <!-- Manifest Permissions (Includes Android Namespace) -->
+        <config-file target="AndroidManifest.xml" parent="/*" xmlns:android="http://schemas.android.com/apk/res/android">
             <uses-permission android:name="android.permission.CAMERA" />
-
-            <!-- Android 11+ Intent Querying -->
-            <queries>
-                <intent>
-                    <action android:name="android.media.action.IMAGE_CAPTURE" />
-                </intent>
-            </queries>
         </config-file>
 
-        <!-- Register FileProvider in Application Element -->
-        <config-file target="AndroidManifest.xml" parent="/manifest/application" xmlns:android="http://schemas.android.com/apk/res/android">
-            <provider
-                android:name="androidx.core.content.FileProvider"
-                android:authorities="${applicationId}.provider"
-                android:exported="false"
-                android:grantUriPermissions="true">
-                <meta-data
-                    android:name="android.support.FILE_PROVIDER_PATHS"
-                    android:resource="@xml/camera_provider_paths" />
-            </provider>
-        </config-file>
-
-        <!-- Path Provider Mapping -->
-        <resource-file src="src/android/xml/camera_provider_paths.xml" target="res/xml/camera_provider_paths.xml" />
-
-        <!-- Source File Path -->
+        <!-- Source File Path for Cordova Android 10+ -->
         <source-file
             src="src/android/CameraLauncher.kt"
             target-dir="app/src/main/java/com/christian/customcamera" />
