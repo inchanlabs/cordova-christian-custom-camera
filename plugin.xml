@@ -22,7 +22,7 @@
     <!-- Android Platform Configuration -->
     <platform name="android">
 
-        <!-- Ensure tools namespace is added to <manifest> in case tools:node is needed elsewhere -->
+        <!-- Bind tools namespace to root manifest to prevent SAXParseException -->
         <edit-config file="AndroidManifest.xml" target="/manifest" mode="merge">
             <manifest xmlns:tools="http://schemas.android.com/tools" />
         </edit-config>
@@ -36,7 +36,6 @@
 
         <!-- Manifest Permissions Block -->
         <config-file target="AndroidManifest.xml" parent="/manifest" xmlns:android="http://schemas.android.com/apk/res/android">
-            <!-- Only keeping the required Camera permission -->
             <uses-permission android:name="android.permission.CAMERA" />
 
             <!-- Android 11+ Intent Querying -->
