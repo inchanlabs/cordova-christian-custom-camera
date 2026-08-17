@@ -6,13 +6,13 @@ import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
-import android.os.Environment
 import android.provider.MediaStore
 import android.util.Base64
 import androidx.core.content.FileProvider
 import org.apache.cordova.CallbackContext
 import org.apache.cordova.CordovaPlugin
 import org.json.JSONArray
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileInputStream
 
@@ -20,6 +20,7 @@ class CameraLauncher : CordovaPlugin() {
 
     private var callbackContext: CallbackContext? = null
     private var imageUri: Uri? = null
+    private var imageFile: File? = null
 
     private val REQUEST_IMAGE_CAPTURE = 1001
     private val CAMERA_PERMISSION_REQ_CODE = 2001
@@ -60,29 +61,40 @@ class CameraLauncher : CordovaPlugin() {
 
             try {
 
-                val imageFile = File.createTempFile(
+                // Create a temporary JPEG file in the app cache.
+                val file = File.createTempFile(
                     "christian_camera_",
                     ".jpg",
                     cordova.activity.cacheDir
                 )
 
-                imageUri = FileProvider.getUriForFile(
+                imageFile = file
+
+                // Create a content:// URI through AndroidX FileProvider.
+                val uri = FileProvider.getUriForFile(
                     cordova.activity,
                     cordova.activity.packageName +
                         ".customcamera.fileprovider",
-                    imageFile
+                    file
                 )
+
+                imageUri = uri
 
                 val takePictureIntent =
                     Intent(MediaStore.ACTION_IMAGE_CAPTURE)
 
+                // Tell the camera app to save the FULL image here.
                 takePictureIntent.putExtra(
                     MediaStore.EXTRA_OUTPUT,
-                    imageUri
+                    uri
+                )
+
+                // Give the camera app permission to write to the URI.
+                takePictureIntent.addFlags(
+                    Intent.FLAG_GRANT_WRITE_URI_PERMISSION
                 )
 
                 takePictureIntent.addFlags(
-                    Intent.FLAG_GRANT_WRITE_URI_PERMISSION or
                     Intent.FLAG_GRANT_READ_URI_PERMISSION
                 )
 
@@ -151,32 +163,24 @@ class CameraLauncher : CordovaPlugin() {
             )
 
             cleanupImageFile()
-
             return
         }
 
         try {
 
-            val uri = imageUri
+            val file = imageFile
 
-            if (uri == null) {
+            if (file == null || !file.exists()) {
 
                 callbackContext?.error(
-                    "Camera image URI is missing."
+                    "Captured image file does not exist."
                 )
 
+                cleanupImageFile()
                 return
             }
 
-            val imageFile = File(
-                uri.path ?: ""
-            )
-
-            /*
-             * Read the full-resolution image directly
-             * from the temporary camera file.
-             */
-            val fileBytes = FileInputStream(imageFile).use {
+            val fileBytes = FileInputStream(file).use {
                 it.readBytes()
             }
 
@@ -187,10 +191,12 @@ class CameraLauncher : CordovaPlugin() {
                 )
 
                 cleanupImageFile()
-
                 return
             }
 
+            // STEP 2B:
+            // Return the original full-resolution JPEG.
+            // No resizing or quality reduction yet.
             val base64Image =
                 Base64.encodeToString(
                     fileBytes,
@@ -218,9 +224,7 @@ class CameraLauncher : CordovaPlugin() {
 
         try {
 
-            imageUri?.path?.let { path ->
-
-                val file = File(path)
+            imageFile?.let { file ->
 
                 if (file.exists()) {
                     file.delete()
@@ -228,9 +232,10 @@ class CameraLauncher : CordovaPlugin() {
             }
 
         } catch (_: Exception) {
-            // Ignore cleanup errors
+            // Ignore cleanup errors.
         }
 
+        imageFile = null
         imageUri = null
     }
 }
