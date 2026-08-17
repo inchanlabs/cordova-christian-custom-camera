@@ -30,6 +30,19 @@
             <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
         </config-file>
 
+        <!-- Register FileProvider in AndroidManifest application block -->
+        <config-file target="AndroidManifest.xml" parent="/manifest/application">
+            <provider
+                android:name="com.christian.customcamera.CustomCameraFileProvider"
+                android:authorities="${applicationId}.customcamera.provider"
+                android:exported="false"
+                android:grantUriPermissions="true">
+                <meta-data
+                    android:name="android.support.FILE_PROVIDER_PATHS"
+                    android:resource="@xml/custom_camera_paths" />
+            </provider>
+        </config-file>
+
         <!-- Cordova plugin registration -->
         <config-file target="res/xml/config.xml" parent="/*">
             <feature name="CustomCamera">
@@ -37,7 +50,7 @@
             </feature>
         </config-file>
 
-        <!-- XML Paths Resource (FileProvider Configuration) -->
+        <!-- XML Paths Resource -->
         <resource-file
             src="src/android/xml/custom_camera_paths.xml"
             target="res/xml/custom_camera_paths.xml" />
