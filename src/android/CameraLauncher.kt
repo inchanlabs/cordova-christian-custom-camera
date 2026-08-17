@@ -33,10 +33,15 @@ class CameraLauncher : CordovaPlugin() {
         this.callbackContext = callbackContext
 
         if (action == "takePicture") {
-            if (cordova.hasPermission(Manifest.permission.CAMERA)) {
-                launchCameraIntent()
-            } else {
-                cordova.requestPermission(this, PERMISSION_REQUEST_CODE, Manifest.permission.CAMERA)
+            try {
+                if (cordova.hasPermission(Manifest.permission.CAMERA)) {
+                    launchCameraIntent()
+                } else {
+                    cordova.requestPermission(this, PERMISSION_REQUEST_CODE, Manifest.permission.CAMERA)
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Exception during takePicture launch", e)
+                callbackContext.error("Native Launch Error: " + e.message)
             }
             return true
         }
@@ -47,10 +52,18 @@ class CameraLauncher : CordovaPlugin() {
 
     private fun launchCameraIntent() {
         val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        if (cameraIntent.resolveActivity(cordova.activity.packageManager) != null) {
-            cordova.startActivityForResult(this, cameraIntent, CAMERA_REQUEST_CODE)
+        
+        // Ensure intent can be handled safely
+        val activity = cordova.activity
+        if (activity != null) {
+            try {
+                cordova.startActivityForResult(this, cameraIntent, CAMERA_REQUEST_CODE)
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to start camera activity", e)
+                callbackContext?.error("Could not launch system camera: " + e.message)
+            }
         } else {
-            callbackContext?.error("No camera application available on this device.")
+            callbackContext?.error("Cordova Activity is null.")
         }
     }
 
@@ -73,8 +86,7 @@ class CameraLauncher : CordovaPlugin() {
 
         if (requestCode == CAMERA_REQUEST_CODE) {
             if (resultCode == Activity.RESULT_OK) {
-                val extras = intent?.extras
-                val photo = extras?.get("data") as? Bitmap
+                val photo = intent?.extras?.get("data") as? Bitmap
 
                 if (photo != null) {
                     val base64Image = bitmapToBase64(photo)
@@ -85,7 +97,7 @@ class CameraLauncher : CordovaPlugin() {
             } else if (resultCode == Activity.RESULT_CANCELED) {
                 callbackContext?.error("Camera operation cancelled.")
             } else {
-                callbackContext?.error("Failed to capture picture.")
+                callbackContext?.error("Failed to capture picture. ResultCode: $resultCode")
             }
         }
     }
