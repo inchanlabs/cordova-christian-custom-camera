@@ -2,7 +2,7 @@ var exec = require("cordova/exec");
 
 var Camera = {
 
-    TEST_VALUE: "STEP_8_EXEC_TEST",
+    TEST_VALUE: "CHRISTIAN_CUSTOM_CAMERA_V1",
 
     CameraDirection: {
         BACK: 0,
@@ -11,7 +11,9 @@ var Camera = {
 
     getPicture: function (successCallback, errorCallback, options) {
 
-        console.log("STEP 8: BEFORE EXEC");
+        options = options || {};
+
+        console.log("CUSTOM CAMERA: BEFORE EXEC");
 
         try {
 
@@ -19,7 +21,7 @@ var Camera = {
                 function (result) {
 
                     console.log(
-                        "STEP 8: EXEC SUCCESS: " + result
+                        "CUSTOM CAMERA: EXEC SUCCESS: " + result
                     );
 
                     if (successCallback) {
@@ -30,7 +32,7 @@ var Camera = {
                 function (error) {
 
                     console.log(
-                        "STEP 8: EXEC ERROR: " + error
+                        "CUSTOM CAMERA: EXEC ERROR: " + error
                     );
 
                     if (errorCallback) {
@@ -38,17 +40,17 @@ var Camera = {
                     }
                 },
 
-                "FakeTestPlugin",
-                "test",
-                []
+                "CustomCamera",
+                "takePicture",
+                [options]
             );
 
-            console.log("STEP 8: AFTER EXEC");
+            console.log("CUSTOM CAMERA: AFTER EXEC");
 
         } catch (error) {
 
             console.log(
-                "STEP 8: EXEC EXCEPTION: " + error
+                "CUSTOM CAMERA: EXEC EXCEPTION: " + error
             );
 
             if (errorCallback) {
