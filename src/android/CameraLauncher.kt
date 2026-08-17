@@ -12,13 +12,19 @@ class CameraLauncher : CordovaPlugin() {
         callbackContext: CallbackContext
     ): Boolean {
 
-        if (action != "takePicture") {
-            callbackContext.error("Unknown action: $action")
-            return false
+        if (action == "takePicture") {
+
+            callbackContext.success(
+                "NATIVE CAMERA PLUGIN REACHED"
+            )
+
+            return true
         }
 
-        callbackContext.success("NATIVE CAMERA PLUGIN REACHED")
+        callbackContext.error(
+            "Unknown action: $action"
+        )
 
-        return true
+        return false
     }
 }
