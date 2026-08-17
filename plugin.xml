@@ -15,26 +15,26 @@
         <engine name="cordova-android" version=">=10.0.0" />
     </engines>
 
-    <!-- JavaScript -->
+    <!-- JavaScript Module -->
     <js-module src="www/Camera.js" name="Camera">
         <clobbers target="plugins.ChristianCustomCamera" />
     </js-module>
 
-    <!-- Android -->
+    <!-- Android Platform -->
     <platform name="android">
 
-        <!-- Permissions & Hardware Features -->
+        <!-- Hardware & Permissions -->
         <config-file target="AndroidManifest.xml" parent="/manifest">
             <uses-permission android:name="android.permission.CAMERA" />
             <uses-feature android:name="android.hardware.camera" android:required="false" />
             <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
         </config-file>
 
-        <!-- Register FileProvider in AndroidManifest application block -->
+        <!-- Safe Unique FileProvider (Prevents App Startup Crashes) -->
         <config-file target="AndroidManifest.xml" parent="/manifest/application">
             <provider
-                android:name="com.christian.customcamera.CustomCameraFileProvider"
-                android:authorities="${applicationId}.customcamera.provider"
+                android:name="androidx.core.content.FileProvider"
+                android:authorities="${applicationId}.christiancustomcamera.provider"
                 android:exported="false"
                 android:grantUriPermissions="true">
                 <meta-data
@@ -43,27 +43,22 @@
             </provider>
         </config-file>
 
-        <!-- Cordova plugin registration with onload auto-instantiation -->
+        <!-- Native Plugin Registration -->
         <config-file target="res/xml/config.xml" parent="/*">
             <feature name="CustomCamera">
                 <param name="android-package" value="com.christian.customcamera.CameraLauncher" />
-                <param name="onload" value="true" />
+                <param name="onload" value="false" />
             </feature>
         </config-file>
 
-        <!-- XML Paths Resource -->
+        <!-- XML File Paths Resource -->
         <resource-file
             src="src/android/xml/custom_camera_paths.xml"
             target="res/xml/custom_camera_paths.xml" />
 
-        <!-- Kotlin Source File -->
+        <!-- Kotlin Launcher Source -->
         <source-file
             src="src/android/CameraLauncher.kt"
-            target-dir="src/com/christian/customcamera" />
-
-        <!-- Java FileProvider Source File -->
-        <source-file
-            src="src/android/CustomCameraFileProvider.java"
             target-dir="src/com/christian/customcamera" />
 
         <!-- Dependencies -->
