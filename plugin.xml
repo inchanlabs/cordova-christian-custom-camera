@@ -2,7 +2,6 @@
 <plugin
     xmlns="http://apache.org/cordova/ns/plugins/1.0"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     id="cordova-christian-custom-camera"
     version="1.0.0">
 
@@ -23,6 +22,11 @@
     <!-- Android Platform Configuration -->
     <platform name="android">
 
+        <!-- Ensure tools namespace is added to <manifest> in case tools:node is needed elsewhere -->
+        <edit-config file="AndroidManifest.xml" target="/manifest" mode="merge">
+            <manifest xmlns:tools="http://schemas.android.com/tools" />
+        </edit-config>
+
         <!-- Config.xml Registration -->
         <config-file target="res/xml/config.xml" parent="/*">
             <feature name="CustomCamera">
@@ -31,20 +35,11 @@
         </config-file>
 
         <!-- Manifest Permissions Block -->
-        <config-file target="AndroidManifest.xml" parent="/manifest" xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools">
+        <config-file target="AndroidManifest.xml" parent="/manifest" xmlns:android="http://schemas.android.com/apk/res/android">
+            <!-- Only keeping the required Camera permission -->
             <uses-permission android:name="android.permission.CAMERA" />
 
-            <!-- Explicitly Remove Restricted Permissions -->
-            <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" tools:node="remove" />
-            <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" tools:node="remove" />
-            <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" tools:node="remove" />
-            <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" tools:node="remove" />
-            <uses-permission android:name="android.permission.READ_CONTACTS" tools:node="remove" />
-            <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" tools:node="remove" />
-            <uses-permission android:name="android.permission.READ_PHONE_NUMBERS" tools:node="remove" />
-            <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" tools:node="remove" />
-
-            <!-- Android 11+ Intent Querying (Correctly Parented under /manifest) -->
+            <!-- Android 11+ Intent Querying -->
             <queries>
                 <intent>
                     <action android:name="android.media.action.IMAGE_CAPTURE" />
