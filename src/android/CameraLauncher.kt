@@ -39,9 +39,13 @@ class CameraLauncher : CordovaPlugin() {
         if ("takePicture" == action) {
 
             if (cordova.hasPermission(Manifest.permission.CAMERA)) {
+
                 Log.d(TAG, "Camera permission already granted.")
+
                 launchCamera()
+
             } else {
+
                 Log.d(TAG, "Requesting camera permission.")
 
                 cordova.requestPermission(
@@ -55,7 +59,11 @@ class CameraLauncher : CordovaPlugin() {
         }
 
         Log.e(TAG, "Action not recognized: $action")
-        callbackContext.error("Action not recognized: $action")
+
+        callbackContext.error(
+            "Action not recognized: $action"
+        )
+
         return false
     }
 
@@ -71,10 +79,8 @@ class CameraLauncher : CordovaPlugin() {
                     Intent(MediaStore.ACTION_IMAGE_CAPTURE)
 
                 /*
-                 * Create a temporary JPEG file inside the application's
+                 * Create a temporary JPEG file in the application's
                  * private cache directory.
-                 *
-                 * This does not require storage permissions.
                  */
                 val photoFile = File.createTempFile(
                     "IMG_",
@@ -88,8 +94,7 @@ class CameraLauncher : CordovaPlugin() {
                 )
 
                 /*
-                 * Convert the file into a content:// URI that can safely
-                 * be shared with the camera application.
+                 * Create a FileProvider URI for the camera.
                  */
                 photoUri = FileProvider.getUriForFile(
                     cordova.activity,
@@ -103,8 +108,8 @@ class CameraLauncher : CordovaPlugin() {
                 )
 
                 /*
-                 * Tell the camera application to save the FULL image
-                 * into this URI instead of returning a thumbnail.
+                 * Tell the camera to save the actual photo
+                 * into this URI.
                  */
                 takePictureIntent.putExtra(
                     MediaStore.EXTRA_OUTPUT,
@@ -112,8 +117,8 @@ class CameraLauncher : CordovaPlugin() {
                 )
 
                 /*
-                 * Grant the camera application permission to write
-                 * to the temporary image URI.
+                 * Give the camera permission to write/read
+                 * the supplied URI.
                  */
                 takePictureIntent.addFlags(
                     Intent.FLAG_GRANT_WRITE_URI_PERMISSION or
@@ -145,7 +150,8 @@ class CameraLauncher : CordovaPlugin() {
                 )
 
                 callbackContext?.error(
-                    "Failed to launch camera: ${e.javaClass.simpleName}: ${e.message}"
+                    "Failed to launch camera: " +
+                    "${e.javaClass.simpleName}: ${e.message}"
                 )
             }
         }
@@ -170,12 +176,19 @@ class CameraLauncher : CordovaPlugin() {
                 grantResults[0] == PackageManager.PERMISSION_GRANTED
             ) {
 
-                Log.d(TAG, "Camera permission granted.")
+                Log.d(
+                    TAG,
+                    "Camera permission granted."
+                )
+
                 launchCamera()
 
             } else {
 
-                Log.e(TAG, "Camera permission denied.")
+                Log.e(
+                    TAG,
+                    "Camera permission denied."
+                )
 
                 callbackContext?.error(
                     "Camera permission denied by user."
@@ -198,155 +211,29 @@ class CameraLauncher : CordovaPlugin() {
 
         Log.d(
             TAG,
-            "onActivityResult() requestCode=$requestCode resultCode=$resultCode photoUri=$photoUri"
+            "onActivityResult() requestCode=$requestCode " +
+            "resultCode=$resultCode " +
+            "photoUri=$photoUri"
         )
 
-        if (requestCode != REQUEST_IMAGE_CAPTURE) {
-            return
-        }
+        /*
+         * TEMPORARY DEBUG CALLBACK
+         *
+         * This intentionally returns a simple string first.
+         * We are testing whether the native Android result
+         * reaches the OutSystems JavaScript callback.
+         */
+        callbackContext?.success(
+            "DEBUG: onActivityResult reached. " +
+            "requestCode=$requestCode " +
+            "resultCode=$resultCode"
+        )
 
-        try {
-
-            /*
-             * User cancelled the camera.
-             */
-            if (resultCode != Activity.RESULT_OK) {
-
-                Log.d(
-                    TAG,
-                    "Camera action cancelled. resultCode=$resultCode"
-                )
-
-                photoUri = null
-
-                callbackContext?.error(
-                    "Camera action cancelled."
-                )
-
-                return
-            }
-
-            /*
-             * Get the URI of the full-resolution image.
-             */
-            val imageFileUri = photoUri
-
-            if (imageFileUri == null) {
-
-                Log.e(
-                    TAG,
-                    "Image URI is missing."
-                )
-
-                callbackContext?.error(
-                    "Image URI is missing."
-                )
-
-                return
-            }
-
-            Log.d(
-                TAG,
-                "Opening captured image URI: $imageFileUri"
-            )
-
-            /*
-             * Open the actual JPEG file.
-             */
-            val inputStream =
-                cordova.activity.contentResolver.openInputStream(
-                    imageFileUri
-                )
-
-            if (inputStream == null) {
-
-                Log.e(
-                    TAG,
-                    "Failed to open captured image."
-                )
-
-                callbackContext?.error(
-                    "Failed to open captured image."
-                )
-
-                return
-            }
-
-            /*
-             * Read the complete JPEG into memory.
-             */
-            val imageBytes = inputStream.use {
-                it.readBytes()
-            }
-
-            Log.d(
-                TAG,
-                "Image bytes read: ${imageBytes.size}"
-            )
-
-            if (imageBytes.isEmpty()) {
-
-                Log.e(
-                    TAG,
-                    "Captured image is empty."
-                )
-
-                callbackContext?.error(
-                    "Captured image is empty."
-                )
-
-                return
-            }
-
-            /*
-             * Convert the ORIGINAL JPEG bytes to Base64.
-             *
-             * No Bitmap conversion.
-             * No target width.
-             * No target height.
-             * No additional JPEG compression.
-             */
-            val base64Image = Base64.encodeToString(
-                imageBytes,
-                Base64.NO_WRAP
-            )
-
-            Log.d(
-                TAG,
-                "Base64 generated. Length=${base64Image.length}"
-            )
-
-            /*
-             * Return the full-resolution image to Cordova/ODC.
-             */
-            callbackContext?.success(
-                "data:image/jpeg;base64,$base64Image"
-            )
-
-            Log.d(
-                TAG,
-                "Success callback sent."
-            )
-
-            /*
-             * Clear the URI reference.
-             */
-            photoUri = null
-
-        } catch (e: Exception) {
-
-            Log.e(
-                TAG,
-                "ERROR processing captured image.",
-                e
-            )
-
-            callbackContext?.error(
-                "Failed to process captured image: " +
-                    "${e.javaClass.simpleName}: ${e.message}"
-            )
-
-            photoUri = null
-        }
+        /*
+         * Stop here temporarily.
+         *
+         * We are NOT processing the image yet.
+         */
+        return
     }
 }
