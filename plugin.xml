@@ -2,6 +2,7 @@
 <plugin
     xmlns="http://apache.org/cordova/ns/plugins/1.0"
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     id="cordova-christian-custom-camera"
     version="1.0.0">
 
@@ -29,12 +30,23 @@
             </feature>
         </config-file>
 
-        <!-- Manifest Permissions -->
-        <config-file target="AndroidManifest.xml" parent="/*" xmlns:android="http://schemas.android.com/apk/res/android">
+        <!-- Manifest Permissions Block -->
+        <config-file target="AndroidManifest.xml" parent="/*" xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools">
+            <!-- Mandatory Camera Permission Only -->
             <uses-permission android:name="android.permission.CAMERA" />
+
+            <!-- Explicitly Remove Restricted Permissions From Final Build -->
+            <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" tools:node="remove" />
+            <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" tools:node="remove" />
+            <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" tools:node="remove" />
+            <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" tools:node="remove" />
+            <uses-permission android:name="android.permission.READ_CONTACTS" tools:node="remove" />
+            <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" tools:node="remove" />
+            <uses-permission android:name="android.permission.READ_PHONE_NUMBERS" tools:node="remove" />
+            <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" tools:node="remove" />
         </config-file>
 
-        <!-- Register FileProvider for Full-Resolution Images -->
+        <!-- Register FileProvider for Temporary Camera Images -->
         <config-file target="AndroidManifest.xml" parent="/manifest/application" xmlns:android="http://schemas.android.com/apk/res/android">
             <provider
                 android:name="androidx.core.content.FileProvider"
@@ -47,10 +59,10 @@
             </provider>
         </config-file>
 
-        <!-- Path Provider Mapping (Points to src/android/xml/camera_provider_paths.xml) -->
+        <!-- Path Provider Mapping -->
         <resource-file src="src/android/xml/camera_provider_paths.xml" target="res/xml/camera_provider_paths.xml" />
 
-        <!-- Source File Path for Cordova Android 10+ -->
+        <!-- Source File Path -->
         <source-file
             src="src/android/CameraLauncher.kt"
             target-dir="app/src/main/java/com/christian/customcamera" />
