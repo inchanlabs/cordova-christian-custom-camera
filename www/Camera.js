@@ -1,6 +1,6 @@
 var exec = require("cordova/exec");
 
-var Camera = {
+var ChristianCustomCamera = {
 
     TEST_VALUE: "CHRISTIAN_CUSTOM_CAMERA_V1",
 
@@ -10,15 +10,18 @@ var Camera = {
     },
 
     getPicture: function (successCallback, errorCallback, options) {
+        var success = typeof successCallback === "function" ? successCallback : function () {};
+        var error = typeof errorCallback === "function" ? errorCallback : function () {};
+        var args = options ? [options] : [];
 
         exec(
-            successCallback,
-            errorCallback,
+            success,
+            error,
             "CustomCamera",
             "takePicture",
-            []
+            args
         );
     }
 };
 
-module.exports = Camera;
+module.exports = ChristianCustomCamera;
