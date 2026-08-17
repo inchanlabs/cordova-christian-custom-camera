@@ -136,16 +136,6 @@ class CameraLauncher : CordovaPlugin() {
                     "data:image/jpeg;base64,$base64Image"
                 )
 
-                // Delete the temporary file after successfully reading it
-                try {
-                    val filePath = imageFileUri.path
-                    if (filePath != null) {
-                        File(filePath).delete()
-                    }
-                } catch (_: Exception) {
-                    // Ignore cleanup errors
-                }
-
                 photoUri = null
 
             } catch (e: Exception) {
