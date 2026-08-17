@@ -47,15 +47,45 @@ class CameraLauncher : CordovaPlugin() {
     }
 
     private fun launchCamera() {
-        cordova.activity.runOnUiThread {
-            try {
-                val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-                cordova.startActivityForResult(this, takePictureIntent, REQUEST_IMAGE_CAPTURE)
-            } catch (e: Exception) {
-                callbackContext?.error("Failed to launch camera: " + e.message)
-            }
+    cordova.activity.runOnUiThread {
+        try {
+            val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+
+            val photoFile = File.createTempFile(
+                "IMG_",
+                ".jpg",
+                cordova.activity.cacheDir
+            )
+
+            photoUri = FileProvider.getUriForFile(
+                cordova.activity,
+                "${cordova.activity.packageName}.fileprovider",
+                photoFile
+            )
+
+            takePictureIntent.putExtra(
+                MediaStore.EXTRA_OUTPUT,
+                photoUri
+            )
+
+            takePictureIntent.addFlags(
+                Intent.FLAG_GRANT_WRITE_URI_PERMISSION or
+                Intent.FLAG_GRANT_READ_URI_PERMISSION
+            )
+
+            cordova.startActivityForResult(
+                this,
+                takePictureIntent,
+                REQUEST_IMAGE_CAPTURE
+            )
+
+        } catch (e: Exception) {
+            callbackContext?.error(
+                "Failed to launch camera: " + e.message
+            )
         }
     }
+}
 
     override fun onRequestPermissionResult(
         requestCode: Int,
