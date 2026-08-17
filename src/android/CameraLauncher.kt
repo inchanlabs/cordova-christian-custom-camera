@@ -1,4 +1,3 @@
-```kotlin
 package com.christian.customcamera
 
 import android.Manifest
@@ -25,52 +24,30 @@ class CameraLauncher : CordovaPlugin() {
         args: JSONArray,
         callbackContext: CallbackContext
     ): Boolean {
-
         this.callbackContext = callbackContext
 
         if ("takePicture" == action) {
-
+            // Check if CAMERA permission is granted at runtime
             if (cordova.hasPermission(Manifest.permission.CAMERA)) {
                 launchCamera()
             } else {
-                cordova.requestPermission(
-                    this,
-                    CAMERA_PERMISSION_REQ_CODE,
-                    Manifest.permission.CAMERA
-                )
+                // Request camera permission dynamically
+                cordova.requestPermission(this, CAMERA_PERMISSION_REQ_CODE, Manifest.permission.CAMERA)
             }
-
             return true
         }
 
-        callbackContext.error(
-            "Action not recognized: $action"
-        )
-
+        callbackContext.error("Action not recognized: $action")
         return false
     }
 
     private fun launchCamera() {
-
         cordova.activity.runOnUiThread {
-
             try {
-
-                val takePictureIntent =
-                    Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-
-                cordova.startActivityForResult(
-                    this,
-                    takePictureIntent,
-                    REQUEST_IMAGE_CAPTURE
-                )
-
+                val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+                cordova.startActivityForResult(this, takePictureIntent, REQUEST_IMAGE_CAPTURE)
             } catch (e: Exception) {
-
-                callbackContext?.error(
-                    "Failed to launch camera: " +
-                    e.message
-                )
+                callbackContext?.error("Failed to launch camera: " + e.message)
             }
         }
     }
@@ -80,84 +57,35 @@ class CameraLauncher : CordovaPlugin() {
         permissions: Array<out String>?,
         grantResults: IntArray?
     ) {
-
         if (requestCode == CAMERA_PERMISSION_REQ_CODE) {
-
-            if (
-                grantResults != null &&
-                grantResults.isNotEmpty() &&
-                grantResults[0] ==
-                    PackageManager.PERMISSION_GRANTED
-            ) {
-
+            if (grantResults != null && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 launchCamera()
-
             } else {
-
-                callbackContext?.error(
-                    "Camera permission denied by user."
-                )
+                callbackContext?.error("Camera permission denied by user.")
             }
         }
     }
 
-    override fun onActivityResult(
-        requestCode: Int,
-        resultCode: Int,
-        intent: Intent?
-    ) {
-
-        super.onActivityResult(
-            requestCode,
-            resultCode,
-            intent
-        )
+    override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
+        super.onActivityResult(requestCode, resultCode, intent)
 
         if (requestCode == REQUEST_IMAGE_CAPTURE) {
-
             if (resultCode == Activity.RESULT_OK) {
-
-                val imageBitmap =
-                    intent?.extras?.get("data") as? Bitmap
+                val imageBitmap = intent?.extras?.get("data") as? Bitmap
 
                 if (imageBitmap != null) {
+                    val byteArrayOutputStream = ByteArrayOutputStream()
+                    imageBitmap.compress(Bitmap.CompressFormat.JPEG, 90, byteArrayOutputStream)
+                    val byteArray = byteArrayOutputStream.toByteArray()
+                    val base64Image = Base64.encodeToString(byteArray, Base64.NO_WRAP)
 
-                    val byteArrayOutputStream =
-                        ByteArrayOutputStream()
-
-                    imageBitmap.compress(
-                        Bitmap.CompressFormat.JPEG,
-                        80,
-                        byteArrayOutputStream
-                    )
-
-                    val byteArray =
-                        byteArrayOutputStream.toByteArray()
-
-                    val base64Image =
-                        Base64.encodeToString(
-                            byteArray,
-                            Base64.NO_WRAP
-                        )
-
-                    callbackContext?.success(
-                        "data:image/jpeg;base64,$base64Image"
-                    )
-
+                    callbackContext?.success("data:image/jpeg;base64,$base64Image")
                 } else {
-
-                    callbackContext?.error(
-                        "Failed to capture image bitmap."
-                    )
+                    callbackContext?.error("Failed to capture image bitmap.")
                 }
-
             } else {
-
-                callbackContext?.error(
-                    "Camera action cancelled."
-                )
+                callbackContext?.error("Camera action cancelled.")
             }
         }
     }
 }
-```
