@@ -34,6 +34,10 @@
             src="src/android/CameraLauncher.kt"
             target-dir="app/src/main/java/com/christian/customcamera" />
 
+        <config-file target="AndroidManifest.xml" parent="/*">
+        <uses-permission android:name="android.permission.CAMERA" />
+        </config-file>
+
     </platform>
 
 </plugin>
