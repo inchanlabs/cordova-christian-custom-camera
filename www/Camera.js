@@ -9,37 +9,17 @@ var Camera = {
         FRONT: 1
     },
 
-    getPicture: function (
-        successCallback,
-        errorCallback,
-        options
-    ) {
+    getPicture: function (successCallback, errorCallback, options) {
 
         options = options || {};
 
-        console.log("CUSTOM CAMERA: BEFORE EXEC");
-
         exec(
-            function (result) {
-                console.log("CUSTOM CAMERA: EXEC SUCCESS");
-
-                if (successCallback) {
-                    successCallback(result);
-                }
-            },
-            function (error) {
-                console.log("CUSTOM CAMERA: EXEC ERROR: " + error);
-
-                if (errorCallback) {
-                    errorCallback(error);
-                }
-            },
+            successCallback,
+            errorCallback,
             "CustomCamera",
             "takePicture",
             [options]
         );
-
-        console.log("CUSTOM CAMERA: AFTER EXEC");
     }
 };
 
