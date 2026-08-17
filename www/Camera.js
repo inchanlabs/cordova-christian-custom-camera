@@ -15,48 +15,15 @@ var Camera = {
         options
     ) {
 
-        console.log("CAMERA: ENTERED getPicture");
+        console.log("CAMERA JS: ENTERED");
 
-        try {
-
-            console.log("CAMERA: exec type = " + typeof exec);
-
-            if (typeof exec !== "function") {
-                throw new Error("cordova/exec is not a function");
-            }
-
-            console.log("CAMERA: BEFORE EXEC");
-
-            exec(
-                function (result) {
-                    console.log("CAMERA: EXEC SUCCESS");
-
-                    if (successCallback) {
-                        successCallback(result);
-                    }
-                },
-                function (error) {
-                    console.log("CAMERA: EXEC ERROR = " + error);
-
-                    if (errorCallback) {
-                        errorCallback(error);
-                    }
-                },
-                "CustomCamera",
-                "takePicture",
-                [options || {}]
+        if (successCallback) {
+            successCallback(
+                "CAMERA JS REACHED WITH EXEC LOADED"
             );
-
-            console.log("CAMERA: AFTER EXEC");
-
-        } catch (e) {
-
-            console.log("CAMERA: EXEC EXCEPTION = " + e.message);
-
-            if (errorCallback) {
-                errorCallback(e.message);
-            }
         }
+
+        console.log("CAMERA JS: EXITED");
     }
 };
 
