@@ -1,7 +1,7 @@
 {
   "name": "cordova-christian-custom-camera",
   "version": "1.0.0",
-  "description": "Custom Cordova Camera Plugin",
+  "description": "Custom Cordova Camera Plugin for OutSystems",
   "cordova": {
     "id": "cordova-christian-custom-camera",
     "platforms": [
@@ -9,8 +9,9 @@
     ]
   },
   "keywords": [
-    "cordova",
-    "camera"
+    "ecosystem:cordova",
+    "cordova-android"
   ],
+  "author": "Christian",
   "license": "Apache-2.0"
 }
