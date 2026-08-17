@@ -5,6 +5,7 @@ import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.provider.MediaStore
 import android.util.Base64
@@ -12,9 +13,7 @@ import androidx.core.content.FileProvider
 import org.apache.cordova.CallbackContext
 import org.apache.cordova.CordovaPlugin
 import org.json.JSONArray
-import java.io.ByteArrayOutputStream
 import java.io.File
-import java.io.FileInputStream
 
 class CameraLauncher : CordovaPlugin() {
 
@@ -61,7 +60,6 @@ class CameraLauncher : CordovaPlugin() {
 
             try {
 
-                // Create a temporary JPEG file in the app cache.
                 val file = File.createTempFile(
                     "christian_camera_",
                     ".jpg",
@@ -70,26 +68,21 @@ class CameraLauncher : CordovaPlugin() {
 
                 imageFile = file
 
-                // Create a content:// URI through AndroidX FileProvider.
-                val uri = FileProvider.getUriForFile(
+                imageUri = FileProvider.getUriForFile(
                     cordova.activity,
                     cordova.activity.packageName +
                         ".customcamera.fileprovider",
                     file
                 )
 
-                imageUri = uri
-
                 val takePictureIntent =
                     Intent(MediaStore.ACTION_IMAGE_CAPTURE)
 
-                // Tell the camera app to save the FULL image here.
                 takePictureIntent.putExtra(
                     MediaStore.EXTRA_OUTPUT,
-                    uri
+                    imageUri
                 )
 
-                // Give the camera app permission to write to the URI.
                 takePictureIntent.addFlags(
                     Intent.FLAG_GRANT_WRITE_URI_PERMISSION
                 )
@@ -180,31 +173,20 @@ class CameraLauncher : CordovaPlugin() {
                 return
             }
 
-            val fileBytes = FileInputStream(file).use {
-                it.readBytes()
-            }
+            val options = BitmapFactory.Options()
+            options.inJustDecodeBounds = true
 
-            if (fileBytes.isEmpty()) {
+            BitmapFactory.decodeFile(
+                file.absolutePath,
+                options
+            )
 
-                callbackContext?.error(
-                    "Captured image is empty."
-                )
-
-                cleanupImageFile()
-                return
-            }
-
-            // STEP 2B:
-            // Return the original full-resolution JPEG.
-            // No resizing or quality reduction yet.
-            val base64Image =
-                Base64.encodeToString(
-                    fileBytes,
-                    Base64.NO_WRAP
-                )
+            val width = options.outWidth
+            val height = options.outHeight
+            val fileSizeKB = file.length() / 1024
 
             callbackContext?.success(
-                "data:image/jpeg;base64,$base64Image"
+                "RESOLUTION: ${width}x${height}, SIZE: ${fileSizeKB} KB"
             )
 
             cleanupImageFile()
@@ -212,7 +194,7 @@ class CameraLauncher : CordovaPlugin() {
         } catch (e: Exception) {
 
             callbackContext?.error(
-                "Failed to process captured image: " +
+                "Failed to inspect image: " +
                 e.message
             )
 
@@ -232,7 +214,6 @@ class CameraLauncher : CordovaPlugin() {
             }
 
         } catch (_: Exception) {
-            // Ignore cleanup errors.
         }
 
         imageFile = null
