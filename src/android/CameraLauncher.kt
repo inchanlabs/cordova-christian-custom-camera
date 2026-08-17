@@ -19,6 +19,8 @@ import java.io.ByteArrayOutputStream
 class CameraLauncher : CordovaPlugin() {
 
     private var callbackContext: CallbackContext? = null
+    private var photoUri: Uri? = null
+
     private val REQUEST_IMAGE_CAPTURE = 1001
     private val CAMERA_PERMISSION_REQ_CODE = 2001
 
