@@ -39,6 +39,22 @@
             src="src/android/CameraLauncher.kt"
             target-dir="app/src/main/java/com/christian/customcamera" />
 
+        <config-file parent="/manifest/application" target="AndroidManifest.xml">
+    <provider
+        android:name="androidx.core.content.FileProvider"
+        android:authorities="${applicationId}.fileprovider"
+        android:exported="false"
+        android:grantUriPermissions="true">
+        <meta-data
+            android:name="android.support.FILE_PROVIDER_PATHS"
+            android:resource="@xml/custom_camera_file_paths" />
+    </provider>
+</config-file>
+
+<resource-file
+    src="src/android/res/xml/custom_camera_file_paths.xml"
+    target="app/src/main/res/xml/custom_camera_file_paths.xml" />
+
     </platform>
 
 </plugin>
