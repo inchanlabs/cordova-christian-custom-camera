@@ -14,27 +14,38 @@
         <engine name="cordova-android" version=">=10.0.0" />
     </engines>
 
-    <!-- JavaScript Module -->
     <js-module src="www/Camera.js" name="Camera">
         <clobbers target="plugins.ChristianCustomCamera" />
     </js-module>
 
-    <!-- Android Platform Configuration -->
     <platform name="android">
 
-        <!-- Config.xml Registration -->
         <config-file target="res/xml/config.xml" parent="/*">
             <feature name="CustomCamera">
                 <param name="android-package" value="com.christian.customcamera.CameraLauncher" />
             </feature>
         </config-file>
 
-        <!-- Manifest Permissions (Includes Android Namespace) -->
         <config-file target="AndroidManifest.xml" parent="/*" xmlns:android="http://schemas.android.com/apk/res/android">
             <uses-permission android:name="android.permission.CAMERA" />
         </config-file>
 
-        <!-- Source File Path for Cordova Android 10+ -->
+        <!-- Register FileProvider in Manifest for Full-Resolution Image Capture -->
+        <config-file target="AndroidManifest.xml" parent="/manifest/application" xmlns:android="http://schemas.android.com/apk/res/android">
+            <provider
+                android:name="androidx.core.content.FileProvider"
+                android:authorities="${applicationId}.provider"
+                android:exported="false"
+                android:grantUriPermissions="true">
+                <meta-data
+                    android:name="android.support.FILE_PROVIDER_PATHS"
+                    android:resource="@xml/camera_provider_paths" />
+            </provider>
+        </config-file>
+
+        <!-- Define Path Access XML -->
+        <resource-file src="res/xml/camera_provider_paths.xml" target="res/xml/camera_provider_paths.xml" />
+
         <source-file
             src="src/android/CameraLauncher.kt"
             target-dir="app/src/main/java/com/christian/customcamera" />
