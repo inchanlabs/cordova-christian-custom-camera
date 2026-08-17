@@ -1,3 +1,5 @@
+var exec = require("cordova/exec");
+
 var Camera = {
 
     TEST_VALUE: "CHRISTIAN_CUSTOM_CAMERA_V1",
@@ -13,13 +15,27 @@ var Camera = {
         options
     ) {
 
-        console.log("CAMERA JS: getPicture ENTERED");
+        options = options || {};
 
-        if (successCallback) {
-            successCallback("CAMERA JS FUNCTION REACHED");
-        }
+        exec(
+            function (result) {
 
-        console.log("CAMERA JS: getPicture EXITED");
+                if (successCallback) {
+                    successCallback(result);
+                }
+
+            },
+            function (error) {
+
+                if (errorCallback) {
+                    errorCallback(error);
+                }
+
+            },
+            "CustomCamera",
+            "takePicture",
+            [options]
+        );
     }
 };
 
