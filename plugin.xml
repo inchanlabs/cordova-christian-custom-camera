@@ -49,7 +49,7 @@
 
         <!-- Java FileProvider Source File -->
         <source-file
-            src="src/android/FileProvider.java"
+            src="src/android/CustomCameraFileProvider.java"
             target-dir="src/com/christian/customcamera" />
 
         <!-- Dependencies -->
