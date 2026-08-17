@@ -11,14 +11,12 @@ class CameraLauncher : CordovaPlugin() {
         args: JSONArray,
         callbackContext: CallbackContext
     ): Boolean {
-
         if (action == "takePicture") {
-            // Immediate success response to test the native bridge
-            callbackContext.success("NATIVE BRIDGE IS WORKING PERFECTLY!")
+            callbackContext.success("NATIVE BRIDGE IS WORKING!")
             return true
         }
 
-        callbackContext.error("Unknown action: $action")
+        callbackContext.error("Invalid action: $action")
         return false
     }
 }
