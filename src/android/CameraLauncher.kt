@@ -4,17 +4,14 @@ import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
+import android.net.Uri
 import android.provider.MediaStore
 import android.util.Base64
-import android.net.Uri
 import androidx.core.content.FileProvider
-import java.io.File
 import org.apache.cordova.CallbackContext
 import org.apache.cordova.CordovaPlugin
-import org.apache.cordova.PluginResult
 import org.json.JSONArray
-import java.io.ByteArrayOutputStream
+import java.io.File
 
 class CameraLauncher : CordovaPlugin() {
 
