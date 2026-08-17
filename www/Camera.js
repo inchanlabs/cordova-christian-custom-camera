@@ -1,6 +1,8 @@
+var exec = require("cordova/exec");
+
 var Camera = {
 
-    TEST_VALUE: "STEP5_CAMERA_JS_2026",
+    TEST_VALUE: "STEP6_EXEC_LOADED",
 
     CameraDirection: {
         BACK: 0,
@@ -9,12 +11,19 @@ var Camera = {
 
     getPicture: function (successCallback, errorCallback, options) {
 
-        console.log("STEP 5: CAMERA.JS LOADED");
-        console.log("STEP 5: GETPICTURE CALLED");
+        console.log("STEP 6: GETPICTURE ENTERED");
+
+        console.log(
+            "STEP 6: EXEC TYPE = " + typeof exec
+        );
 
         if (successCallback) {
-            successCallback("STEP 5 CAMERA JS WORKS");
+            successCallback(
+                "STEP 6 EXEC LOADED"
+            );
         }
+
+        console.log("STEP 6: GETPICTURE EXITED");
     }
 };
 
