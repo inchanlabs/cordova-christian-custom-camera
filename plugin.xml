@@ -1,3 +1,4 @@
+```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin
     xmlns="http://apache.org/cordova/ns/plugins/1.0"
@@ -25,16 +26,49 @@
         <!-- Config.xml Registration -->
         <config-file target="res/xml/config.xml" parent="/*">
             <feature name="CustomCamera">
-                <param name="android-package" value="com.christian.customcamera.CameraLauncher" />
+                <param
+                    name="android-package"
+                    value="com.christian.customcamera.CameraLauncher" />
             </feature>
         </config-file>
 
-        <!-- Manifest Permissions (Includes Android Namespace) -->
-        <config-file target="AndroidManifest.xml" parent="/*" xmlns:android="http://schemas.android.com/apk/res/android">
-            <uses-permission android:name="android.permission.CAMERA" />
+        <!-- Manifest Permissions -->
+        <config-file
+            target="AndroidManifest.xml"
+            parent="/*"
+            xmlns:android="http://schemas.android.com/apk/res/android">
+
+            <uses-permission
+                android:name="android.permission.CAMERA" />
+
         </config-file>
 
-        <!-- Source File Path for Cordova Android 10+ -->
+        <!-- FileProvider Paths -->
+        <resource-file
+            src="src/android/xml/camera_provider_paths.xml"
+            target="app/src/main/res/xml/camera_provider_paths.xml" />
+
+        <!-- FileProvider -->
+        <edit-config
+            file="app/src/main/AndroidManifest.xml"
+            mode="merge"
+            target="/manifest/application">
+
+            <provider
+                android:name="androidx.core.content.FileProvider"
+                android:authorities="${applicationId}.customcamera.fileprovider"
+                android:exported="false"
+                android:grantUriPermissions="true">
+
+                <meta-data
+                    android:name="android.support.FILE_PROVIDER_PATHS"
+                    android:resource="@xml/camera_provider_paths" />
+
+            </provider>
+
+        </edit-config>
+
+        <!-- Kotlin Source -->
         <source-file
             src="src/android/CameraLauncher.kt"
             target-dir="app/src/main/java/com/christian/customcamera" />
@@ -42,3 +76,4 @@
     </platform>
 
 </plugin>
+```
