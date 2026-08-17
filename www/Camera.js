@@ -2,8 +2,7 @@ var exec = require("cordova/exec");
 
 var ChristianCustomCamera = {
     getPicture: function (successCallback, errorCallback, options) {
-        var options = options || {};
-        
+        var opts = options || {};
         exec(
             function(result) {
                 if (typeof successCallback === "function") {
@@ -17,7 +16,7 @@ var ChristianCustomCamera = {
             },
             "CustomCamera",
             "takePicture",
-            [options]
+            [opts]
         );
     }
 };
