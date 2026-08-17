@@ -34,19 +34,28 @@ class CameraLauncher : CordovaPlugin() {
 
         this.callbackContext = callbackContext
 
-        Log.d(TAG, "execute() called. action=$action")
+        Log.d(
+            TAG,
+            "execute() called. action=$action"
+        )
 
         if ("takePicture" == action) {
 
             if (cordova.hasPermission(Manifest.permission.CAMERA)) {
 
-                Log.d(TAG, "Camera permission already granted.")
+                Log.d(
+                    TAG,
+                    "Camera permission already granted."
+                )
 
                 launchCamera()
 
             } else {
 
-                Log.d(TAG, "Requesting camera permission.")
+                Log.d(
+                    TAG,
+                    "Requesting camera permission."
+                )
 
                 cordova.requestPermission(
                     this,
@@ -58,7 +67,10 @@ class CameraLauncher : CordovaPlugin() {
             return true
         }
 
-        Log.e(TAG, "Action not recognized: $action")
+        Log.e(
+            TAG,
+            "Action not recognized: $action"
+        )
 
         callbackContext.error(
             "Action not recognized: $action"
@@ -73,7 +85,10 @@ class CameraLauncher : CordovaPlugin() {
 
             try {
 
-                Log.d(TAG, "Preparing camera intent.")
+                Log.d(
+                    TAG,
+                    "Preparing camera intent."
+                )
 
                 val takePictureIntent =
                     Intent(MediaStore.ACTION_IMAGE_CAPTURE)
@@ -90,11 +105,26 @@ class CameraLauncher : CordovaPlugin() {
 
                 Log.d(
                     TAG,
-                    "Temporary photo file created: ${photoFile.absolutePath}"
+                    "Photo file created."
+                )
+
+                Log.d(
+                    TAG,
+                    "Photo file path: ${photoFile.absolutePath}"
+                )
+
+                Log.d(
+                    TAG,
+                    "Photo file exists: ${photoFile.exists()}"
+                )
+
+                Log.d(
+                    TAG,
+                    "Photo file canWrite: ${photoFile.canWrite()}"
                 )
 
                 /*
-                 * Create a FileProvider URI for the camera.
+                 * Create the FileProvider URI.
                  */
                 photoUri = FileProvider.getUriForFile(
                     cordova.activity,
@@ -117,14 +147,31 @@ class CameraLauncher : CordovaPlugin() {
                 )
 
                 /*
-                 * Give the camera permission to write/read
-                 * the supplied URI.
+                 * Grant the camera application permission
+                 * to read and write the URI.
                  */
                 takePictureIntent.addFlags(
                     Intent.FLAG_GRANT_WRITE_URI_PERMISSION or
                     Intent.FLAG_GRANT_READ_URI_PERMISSION
                 )
 
+                /*
+                 * Check whether Android can resolve a camera
+                 * application for this intent.
+                 */
+                val resolvedActivities =
+                    takePictureIntent.resolveActivity(
+                        cordova.activity.packageManager
+                    )
+
+                Log.d(
+                    TAG,
+                    "Camera activity resolved: $resolvedActivities"
+                )
+
+                /*
+                 * Launch camera.
+                 */
                 Log.d(
                     TAG,
                     "Launching camera with output URI: $photoUri"
@@ -138,7 +185,7 @@ class CameraLauncher : CordovaPlugin() {
 
                 Log.d(
                     TAG,
-                    "Camera activity launched successfully."
+                    "Camera activity launched."
                 )
 
             } catch (e: Exception) {
@@ -217,11 +264,10 @@ class CameraLauncher : CordovaPlugin() {
         )
 
         /*
-         * TEMPORARY DEBUG CALLBACK
+         * TEMPORARY DEBUG:
          *
-         * This intentionally returns a simple string first.
-         * We are testing whether the native Android result
-         * reaches the OutSystems JavaScript callback.
+         * We are only checking whether the camera returns
+         * successfully to the Cordova plugin.
          */
         callbackContext?.success(
             "DEBUG: onActivityResult reached. " +
@@ -232,7 +278,7 @@ class CameraLauncher : CordovaPlugin() {
         /*
          * Stop here temporarily.
          *
-         * We are NOT processing the image yet.
+         * We are not processing the image yet.
          */
         return
     }
