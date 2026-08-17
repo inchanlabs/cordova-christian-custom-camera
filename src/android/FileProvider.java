@@ -1,6 +1,7 @@
 package com.christian.customcamera;
 
-import org.apache.cordova.camera.FileProvider;
+import androidx.core.content.FileProvider as AndroidXFileProvider;
 
-public class CustomCameraFileProvider extends FileProvider {
+public class FileProvider extends AndroidXFileProvider {
+    // Leave the rest of your existing code here
 }
