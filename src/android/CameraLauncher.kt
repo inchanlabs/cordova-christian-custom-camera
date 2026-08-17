@@ -60,6 +60,8 @@ class CameraLauncher : CordovaPlugin() {
                 photoFile
             )
 
+            android.util.Log.d("ChristianCustomCamera","Photo URI created: $photoUri")
+
             takePictureIntent.putExtra(
                 MediaStore.EXTRA_OUTPUT,
                 photoUri
@@ -69,6 +71,8 @@ class CameraLauncher : CordovaPlugin() {
                 Intent.FLAG_GRANT_WRITE_URI_PERMISSION or
                 Intent.FLAG_GRANT_READ_URI_PERMISSION
             )
+            
+            android.util.Log.d("ChristianCustomCamera","Launching camera with output URI: $photoUri")
 
             cordova.startActivityForResult(
                 this,
@@ -100,6 +104,11 @@ class CameraLauncher : CordovaPlugin() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
     super.onActivityResult(requestCode, resultCode, intent)
+
+    android.util.Log.d(
+    "ChristianCustomCamera",
+    "onActivityResult: requestCode=$requestCode resultCode=$resultCode photoUri=$photoUri"
+)
 
     if (requestCode == REQUEST_IMAGE_CAPTURE) {
         if (resultCode == Activity.RESULT_OK) {
