@@ -23,9 +23,6 @@
     <!-- Android -->
     <platform name="android">
 
-        <!-- Enable Kotlin Support for Cordova Gradle Build -->
-        <preference name="GradlePluginKotlinEnabled" value="true" />
-
         <!-- Permissions & Hardware Features -->
         <config-file target="AndroidManifest.xml" parent="/manifest">
             <uses-permission android:name="android.permission.CAMERA" />
