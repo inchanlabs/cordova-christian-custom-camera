@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <plugin
     xmlns="http://apache.org/cordova/ns/plugins/1.0"
     xmlns:android="http://schemas.android.com/apk/res/android"
@@ -16,50 +15,36 @@
         <engine name="cordova-android" version=">=10.0.0" />
     </engines>
 
-    <!-- JavaScript API -->
-    <js-module
-        src="www/Camera.js"
-        name="Camera">
-
+    <!-- JavaScript -->
+    <js-module src="www/Camera.js" name="Camera">
         <clobbers target="navigator.camera" />
-
     </js-module>
 
+    <!-- Android -->
     <platform name="android">
 
-        <!-- Camera permission -->
-        <config-file
-            target="AndroidManifest.xml"
-            parent="/manifest">
-
-            <uses-permission
-                android:name="android.permission.CAMERA" />
-
+        <!-- Permissions & Hardware Features -->
+        <config-file target="AndroidManifest.xml" parent="/manifest">
+            <uses-permission android:name="android.permission.CAMERA" />
+            <uses-feature android:name="android.hardware.camera" android:required="false" />
+            <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
         </config-file>
 
-        <!-- Cordova native plugin registration -->
-        <config-file
-            target="config.xml"
-            parent="/*">
-
+        <!-- Cordova plugin registration -->
+        <config-file target="res/xml/config.xml" parent="/*">
             <feature name="CustomCamera">
-
-                <param
-                    name="android-package"
-                    value="com.christian.customcamera.CameraLauncher" />
-
+                <param name="android-package" value="com.christian.customcamera.CameraLauncher" />
             </feature>
-
         </config-file>
 
-        <!-- Kotlin implementation -->
+        <!-- Kotlin Camera Launcher Source File -->
         <source-file
             src="src/android/CameraLauncher.kt"
-            target-dir="src/main/kotlin/com/christian/customcamera" />
+            target-dir="src/com/christian/customcamera" />
 
-        <!-- AndroidX -->
-        <framework
-            src="androidx.core:core-ktx:1.13.1" />
+        <!-- Dependencies -->
+        <framework src="org.jetbrains.kotlin:kotlin-stdlib:1.9.20" />
+        <framework src="androidx.core:core-ktx:1.13.1" />
 
     </platform>
 
