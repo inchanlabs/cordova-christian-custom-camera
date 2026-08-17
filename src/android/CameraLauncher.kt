@@ -21,7 +21,8 @@ class CameraLauncher : CordovaPlugin() {
     private var callbackContext: CallbackContext? = null
     private val REQUEST_IMAGE_CAPTURE = 1001
     private val CAMERA_PERMISSION_REQ_CODE = 2001
-    private var photoFile: File? = null
+    private var photoUri: Uri? = null
+    private var imageFilePath: String? = null
 
     override fun execute(
         action: String,
@@ -48,23 +49,31 @@ class CameraLauncher : CordovaPlugin() {
             try {
                 val context = cordova.activity.applicationContext
                 val storageDir = context.cacheDir
-                photoFile = File.createTempFile("captured_image_", ".jpg", storageDir)
+                val photoFile = File.createTempFile("photo_", ".jpg", storageDir)
+                imageFilePath = photoFile.absolutePath
 
-                val photoURI: Uri = FileProvider.getUriForFile(
-                    context,
-                    context.packageName + ".provider",
-                    photoFile!!
+                val authority = context.packageName + ".provider"
+                photoUri = FileProvider.getUriForFile(context, authority, photoFile)
+
+                val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri)
+
+                // Grant dynamic permissions to all matching camera packages
+                val resInfoList = context.packageManager.queryIntentActivities(
+                    intent,
+                    PackageManager.MATCH_DEFAULT_ONLY
                 )
+                for (resolveInfo in resInfoList) {
+                    val packageName = resolveInfo.activityInfo.packageName
+                    context.grantUriPermission(
+                        packageName,
+                        photoUri,
+                        Intent.FLAG_GRANT_WRITE_URI_PERMISSION or Intent.FLAG_GRANT_READ_URI_PERMISSION
+                    )
+                }
 
-                val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
-
-                // Grant temporary write permissions to camera activity
-                takePictureIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                takePictureIntent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
-
-                if (takePictureIntent.resolveActivity(context.packageManager) != null) {
-                    cordova.startActivityForResult(this, takePictureIntent, REQUEST_IMAGE_CAPTURE)
+                if (intent.resolveActivity(context.packageManager) != null) {
+                    cordova.startActivityForResult(this, intent, REQUEST_IMAGE_CAPTURE)
                 } else {
                     callbackContext?.error("No camera app found on device.")
                 }
@@ -95,10 +104,12 @@ class CameraLauncher : CordovaPlugin() {
             if (resultCode == Activity.RESULT_OK) {
                 cordova.threadPool.execute {
                     try {
-                        val file = photoFile
+                        val path = imageFilePath
+                        val file = if (path != null) File(path) else null
+
                         if (file != null && file.exists() && file.length() > 0) {
 
-                            // Decode bounds to scale down extremely large images and prevent Memory Crashes
+                            // Compress and decode to avoid memory crashes
                             val options = BitmapFactory.Options().apply {
                                 inJustDecodeBounds = true
                             }
@@ -126,16 +137,16 @@ class CameraLauncher : CordovaPlugin() {
                                 val byteArray = byteArrayOutputStream.toByteArray()
                                 val base64Image = Base64.encodeToString(byteArray, Base64.NO_WRAP)
 
-                                file.delete() // Clean temp file
+                                file.delete() // Cleanup
                                 callbackContext?.success("data:image/jpeg;base64,$base64Image")
                             } else {
-                                callbackContext?.error("Bitmap decoding returned null.")
+                                callbackContext?.error("Bitmap conversion failed.")
                             }
                         } else {
-                            callbackContext?.error("Image file empty or not found on disk.")
+                            callbackContext?.error("Captured photo file missing or 0 bytes.")
                         }
                     } catch (e: Exception) {
-                        callbackContext?.error("Processing error: " + e.localizedMessage)
+                        callbackContext?.error("Processing exception: " + e.localizedMessage)
                     }
                 }
             } else {
