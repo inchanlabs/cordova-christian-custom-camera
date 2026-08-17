@@ -99,25 +99,64 @@ class CameraLauncher : CordovaPlugin() {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
-        super.onActivityResult(requestCode, resultCode, intent)
+    super.onActivityResult(requestCode, resultCode, intent)
 
-        if (requestCode == REQUEST_IMAGE_CAPTURE) {
-            if (resultCode == Activity.RESULT_OK) {
-                val imageBitmap = intent?.extras?.get("data") as? Bitmap
+    if (requestCode == REQUEST_IMAGE_CAPTURE) {
+        if (resultCode == Activity.RESULT_OK) {
+            try {
+                val imageFileUri = photoUri
 
-                if (imageBitmap != null) {
-                    val byteArrayOutputStream = ByteArrayOutputStream()
-                    imageBitmap.compress(Bitmap.CompressFormat.JPEG, 90, byteArrayOutputStream)
-                    val byteArray = byteArrayOutputStream.toByteArray()
-                    val base64Image = Base64.encodeToString(byteArray, Base64.NO_WRAP)
-
-                    callbackContext?.success("data:image/jpeg;base64,$base64Image")
-                } else {
-                    callbackContext?.error("Failed to capture image bitmap.")
+                if (imageFileUri == null) {
+                    callbackContext?.error("Image URI is missing.")
+                    return
                 }
-            } else {
-                callbackContext?.error("Camera action cancelled.")
+
+                val inputStream = cordova.activity.contentResolver.openInputStream(imageFileUri)
+
+                if (inputStream == null) {
+                    callbackContext?.error("Failed to open captured image.")
+                    return
+                }
+
+                val imageBytes = inputStream.use {
+                    it.readBytes()
+                }
+
+                if (imageBytes.isEmpty()) {
+                    callbackContext?.error("Captured image is empty.")
+                    return
+                }
+
+                val base64Image = Base64.encodeToString(
+                    imageBytes,
+                    Base64.NO_WRAP
+                )
+
+                callbackContext?.success(
+                    "data:image/jpeg;base64,$base64Image"
+                )
+
+                // Delete the temporary file after successfully reading it
+                try {
+                    val filePath = imageFileUri.path
+                    if (filePath != null) {
+                        File(filePath).delete()
+                    }
+                } catch (_: Exception) {
+                    // Ignore cleanup errors
+                }
+
+                photoUri = null
+
+            } catch (e: Exception) {
+                callbackContext?.error(
+                    "Failed to process captured image: " + e.message
+                )
             }
+        } else {
+            photoUri = null
+            callbackContext?.error("Camera action cancelled.")
         }
     }
+}
 }
