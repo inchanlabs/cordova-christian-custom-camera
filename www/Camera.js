@@ -2,7 +2,7 @@ var exec = require("cordova/exec");
 
 var Camera = {
 
-    TEST_VALUE: "STEP6_EXEC_LOADED",
+    TEST_VALUE: "STEP7_EXEC_TEST",
 
     CameraDirection: {
         BACK: 0,
@@ -11,19 +11,52 @@ var Camera = {
 
     getPicture: function (successCallback, errorCallback, options) {
 
-        console.log("STEP 6: GETPICTURE ENTERED");
+        console.log("STEP 7: BEFORE EXEC");
 
-        console.log(
-            "STEP 6: EXEC TYPE = " + typeof exec
-        );
+        try {
 
-        if (successCallback) {
-            successCallback(
-                "STEP 6 EXEC LOADED"
+            exec(
+                function (result) {
+
+                    console.log(
+                        "STEP 7: EXEC SUCCESS: " + result
+                    );
+
+                    if (successCallback) {
+                        successCallback(result);
+                    }
+                },
+
+                function (error) {
+
+                    console.log(
+                        "STEP 7: EXEC ERROR: " + error
+                    );
+
+                    if (errorCallback) {
+                        errorCallback(error);
+                    }
+                },
+
+                "FakeTestPlugin",
+                "test",
+                []
             );
-        }
 
-        console.log("STEP 6: GETPICTURE EXITED");
+            console.log("STEP 7: AFTER EXEC");
+
+        } catch (error) {
+
+            console.log(
+                "STEP 7: EXEC EXCEPTION: " + error
+            );
+
+            if (errorCallback) {
+                errorCallback(
+                    "EXEC EXCEPTION: " + error
+                );
+            }
+        }
     }
 };
 
