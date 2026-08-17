@@ -17,8 +17,8 @@
 
     <!-- JavaScript -->
     <js-module src="www/Camera.js" name="Camera">
-        <clobbers target="navigator.camera" />
-    </js-module>
+    <clobbers target="plugins.ChristianCustomCamera" />
+</js-module>
 
     <!-- Android -->
     <platform name="android">
