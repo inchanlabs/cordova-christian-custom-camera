@@ -2,11 +2,11 @@ package com.christian.customcamera
 
 import android.Manifest
 import android.app.Activity
+import android.content.ClipData
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.provider.MediaStore
-import android.util.Base64
 import android.util.Log
 import androidx.core.content.FileProvider
 import org.apache.cordova.CallbackContext
@@ -94,18 +94,13 @@ class CameraLauncher : CordovaPlugin() {
                     Intent(MediaStore.ACTION_IMAGE_CAPTURE)
 
                 /*
-                 * Create a temporary JPEG file in the application's
+                 * Create temporary JPEG file inside the application's
                  * private cache directory.
                  */
                 val photoFile = File.createTempFile(
                     "IMG_",
                     ".jpg",
                     cordova.activity.cacheDir
-                )
-
-                Log.d(
-                    TAG,
-                    "Photo file created."
                 )
 
                 Log.d(
@@ -124,7 +119,7 @@ class CameraLauncher : CordovaPlugin() {
                 )
 
                 /*
-                 * Create the FileProvider URI.
+                 * Create FileProvider URI.
                  */
                 photoUri = FileProvider.getUriForFile(
                     cordova.activity,
@@ -134,12 +129,11 @@ class CameraLauncher : CordovaPlugin() {
 
                 Log.d(
                     TAG,
-                    "Photo URI created: $photoUri"
+                    "Photo URI: $photoUri"
                 )
 
                 /*
-                 * Tell the camera to save the actual photo
-                 * into this URI.
+                 * Give the camera application the output URI.
                  */
                 takePictureIntent.putExtra(
                     MediaStore.EXTRA_OUTPUT,
@@ -147,8 +141,7 @@ class CameraLauncher : CordovaPlugin() {
                 )
 
                 /*
-                 * Grant the camera application permission
-                 * to read and write the URI.
+                 * Explicit URI permissions.
                  */
                 takePictureIntent.addFlags(
                     Intent.FLAG_GRANT_WRITE_URI_PERMISSION or
@@ -156,27 +149,66 @@ class CameraLauncher : CordovaPlugin() {
                 )
 
                 /*
-                 * Check whether Android can resolve a camera
-                 * application for this intent.
+                 * Some camera applications require the URI to also
+                 * be supplied through ClipData for the URI permission
+                 * grant to be recognized correctly.
                  */
-                val resolvedActivities =
+                takePictureIntent.clipData =
+                    ClipData.newRawUri(
+                        "CameraOutput",
+                        photoUri
+                    )
+
+                /*
+                 * Find the application that will handle the camera intent.
+                 */
+                val resolvedActivity =
                     takePictureIntent.resolveActivity(
                         cordova.activity.packageManager
                     )
 
                 Log.d(
                     TAG,
-                    "Camera activity resolved: $resolvedActivities"
+                    "Resolved camera activity: $resolvedActivity"
+                )
+
+                if (resolvedActivity == null) {
+
+                    callbackContext?.error(
+                        "No camera application is available."
+                    )
+
+                    photoUri = null
+                    return@runOnUiThread
+                }
+
+                /*
+                 * Explicitly grant the resolved camera application
+                 * permission to access the output URI.
+                 */
+                val cameraPackage =
+                    resolvedActivity.packageName
+
+                Log.d(
+                    TAG,
+                    "Granting URI permission to: $cameraPackage"
+                )
+
+                cordova.activity.grantUriPermission(
+                    cameraPackage,
+                    photoUri,
+                    Intent.FLAG_GRANT_WRITE_URI_PERMISSION or
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION
+                )
+
+                Log.d(
+                    TAG,
+                    "URI permission granted."
                 )
 
                 /*
-                 * Launch camera.
+                 * Launch the camera.
                  */
-                Log.d(
-                    TAG,
-                    "Launching camera with output URI: $photoUri"
-                )
-
                 cordova.startActivityForResult(
                     this,
                     takePictureIntent,
@@ -195,6 +227,8 @@ class CameraLauncher : CordovaPlugin() {
                     "Failed to launch camera.",
                     e
                 )
+
+                photoUri = null
 
                 callbackContext?.error(
                     "Failed to launch camera: " +
@@ -264,10 +298,9 @@ class CameraLauncher : CordovaPlugin() {
         )
 
         /*
-         * TEMPORARY DEBUG:
+         * TEMPORARY DEBUG ONLY.
          *
-         * We are only checking whether the camera returns
-         * successfully to the Cordova plugin.
+         * We are still testing whether Android returns RESULT_OK.
          */
         callbackContext?.success(
             "DEBUG: onActivityResult reached. " +
@@ -276,9 +309,7 @@ class CameraLauncher : CordovaPlugin() {
         )
 
         /*
-         * Stop here temporarily.
-         *
-         * We are not processing the image yet.
+         * Do not process the image yet.
          */
         return
     }
