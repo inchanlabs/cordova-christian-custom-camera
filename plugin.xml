@@ -8,7 +8,6 @@
     <name>Christian Custom Camera</name>
     <description>Custom Cordova Camera Plugin</description>
     <license>Apache-2.0</license>
-    <keywords>cordova,camera</keywords>
 
     <engines>
         <engine name="cordova" version=">=10.0.0" />
@@ -23,47 +22,19 @@
     <!-- Android Platform -->
     <platform name="android">
 
-        <!-- Hardware & Permissions -->
-        <config-file target="AndroidManifest.xml" parent="/manifest">
-            <uses-permission android:name="android.permission.CAMERA" />
-            <uses-feature android:name="android.hardware.camera" android:required="false" />
-            <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
-        </config-file>
-
-        <!-- Safe Unique FileProvider (Prevents App Startup Crashes) -->
-        <config-file target="AndroidManifest.xml" parent="/manifest/application">
-            <provider
-                android:name="androidx.core.content.FileProvider"
-                android:authorities="${applicationId}.christiancustomcamera.provider"
-                android:exported="false"
-                android:grantUriPermissions="true">
-                <meta-data
-                    android:name="android.support.FILE_PROVIDER_PATHS"
-                    android:resource="@xml/custom_camera_paths" />
-            </provider>
-        </config-file>
-
-        <!-- Native Plugin Registration -->
+        <!-- Cordova Feature Registration -->
         <config-file target="res/xml/config.xml" parent="/*">
             <feature name="CustomCamera">
                 <param name="android-package" value="com.christian.customcamera.CameraLauncher" />
-                <param name="onload" value="false" />
             </feature>
         </config-file>
 
-        <!-- XML File Paths Resource -->
-        <resource-file
-            src="src/android/xml/custom_camera_paths.xml"
-            target="res/xml/custom_camera_paths.xml" />
-
-        <!-- Kotlin Launcher Source -->
+        <!-- Kotlin Source File Mapping -->
         <source-file
             src="src/android/CameraLauncher.kt"
             target-dir="src/com/christian/customcamera" />
 
-        <!-- Dependencies -->
         <framework src="org.jetbrains.kotlin:kotlin-stdlib:1.9.20" />
-        <framework src="androidx.core:core-ktx:1.13.1" />
 
     </platform>
 
