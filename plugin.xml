@@ -62,8 +62,8 @@
 
         <!-- FileProvider Paths -->
         <resource-file
-            src="src/android/xml/camera_provider_paths.xml"
-            target="app/src/main/res/xml/camera_provider_paths.xml" />
+                src="src/android/xml/camera_provider_paths.xml"
+                target="res/xml/camera_provider_paths.xml" />
 
         <!-- Kotlin Source -->
         <source-file
