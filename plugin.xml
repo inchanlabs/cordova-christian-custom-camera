@@ -6,7 +6,7 @@
     version="1.0.0">
 
     <name>Christian Custom Camera</name>
-    <description>Custom Cordova Camera Plugin</description>
+    <description>Custom Cordova Camera Plugin for OutSystems</description>
     <license>Apache-2.0</license>
 
     <engines>
@@ -19,22 +19,20 @@
         <clobbers target="plugins.ChristianCustomCamera" />
     </js-module>
 
-    <!-- Android Platform -->
+    <!-- Android Platform Configuration -->
     <platform name="android">
 
-        <!-- Cordova Feature Registration -->
+        <!-- Config.xml Registration -->
         <config-file target="res/xml/config.xml" parent="/*">
             <feature name="CustomCamera">
                 <param name="android-package" value="com.christian.customcamera.CameraLauncher" />
             </feature>
         </config-file>
 
-        <!-- Kotlin Source File Mapping -->
+        <!-- Correct Target Directory Path for ODC / Cordova Android 10+ -->
         <source-file
             src="src/android/CameraLauncher.kt"
-            target-dir="src/com/christian/customcamera" />
-
-        <framework src="org.jetbrains.kotlin:kotlin-stdlib:1.9.20" />
+            target-dir="app/src/main/java/com/christian/customcamera" />
 
     </platform>
 
