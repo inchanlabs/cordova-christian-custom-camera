@@ -7,6 +7,9 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.provider.MediaStore
 import android.util.Base64
+import android.net.Uri
+import androidx.core.content.FileProvider
+import java.io.File
 import org.apache.cordova.CallbackContext
 import org.apache.cordova.CordovaPlugin
 import org.apache.cordova.PluginResult
