@@ -37,9 +37,19 @@
             </feature>
         </config-file>
 
-        <!-- Kotlin Camera Launcher Source File -->
+        <!-- XML Paths Resource (FileProvider Configuration) -->
+        <resource-file
+            src="src/android/xml/custom_camera_paths.xml"
+            target="res/xml/custom_camera_paths.xml" />
+
+        <!-- Kotlin Source File -->
         <source-file
             src="src/android/CameraLauncher.kt"
+            target-dir="src/com/christian/customcamera" />
+
+        <!-- Java FileProvider Source File -->
+        <source-file
+            src="src/android/FileProvider.java"
             target-dir="src/com/christian/customcamera" />
 
         <!-- Dependencies -->
